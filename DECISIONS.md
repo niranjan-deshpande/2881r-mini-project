@@ -14,7 +14,12 @@ One line per non-obvious choice, with the reason. Newest at the bottom of each s
 - Label-shuffled DoMs use balanced sign flips within pairs (exactly half the pairs swapped), not coin flips. — With coin flips the ±1/√n imbalance leaks v: on the Claude pairs, coin-flip shuffles had |cos| ≈ 0.41 with v_hack.
 
 ## Generation (pending pilot)
-- Generator chosen by a 3-arm pilot (GPT-6 Luna high effort / GPT-5.6 Terra / Claude Sonnet subagents), same prompts and seeds, blind-graded. Rule fixed before looking: pick the cheapest arm within ~5 points of the best on auto-check pass rate and contamination rate, and not noticeably more templated. — Brief fixed Terra, but the actual requirement is one generator for everything.
+- Generator chosen by a 2-arm pilot (GPT-6 Luna high effort vs GPT-5.6 Terra), same prompts and seeds, blind-graded by DeepSeek V4 Pro. Rule fixed before looking: Luna if within ~5 points of Terra on auto-check pass rate and contamination rate and not noticeably more templated. — Brief fixed Terra, but the actual requirement is one generator for everything; Luna is ~6–20× cheaper.
+- No Claude-subagent generator arm. — Nonstandard; the Claude Code system prompt and tool context make the generation process hard to document and reproduce.
+- No GPT-6 Sol anywhere. — Overkill; DeepSeek V4 Pro gives independent (third-family) grading at a fraction of the cost.
+- Rebuilt hack pairs are length-matched (≤ 1.2 ratio) unlike the Claude pairs (median 1.5). — Brief's shared-format rule; length is a known confound; matching Agastya's vector exactly is not a goal.
+- task_failure branches diverge at the tool output one message before the measured assistant turn. — An honest 'fails' and an honest 'passes' report need different outputs; the alternative makes B's success claim unsupported.
+- legit_shortcut: primary variant `plain` (no 'just'/'directly'); `colloquial` measured separately. — Isolates the lexical cue the original hack turns skew toward.
 
 ## Analysis code (`src/rhdecomp/`)
 - Length control: one OLS fit of score on log(n_tokens) over all evaluation passages, not refit inside bootstrap resamples. — Conservative; also removes any hack signal that covaries with length.
