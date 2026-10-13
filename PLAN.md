@@ -25,4 +25,5 @@ The brief (`../claude_code_prompt.md`) is unchanged. This file tracks where the 
 
 ## Current estimates
 - **API:** ~$55 if the generator is Terra. Much less with Luna (~$5–10 for generation) or Claude subagents (~$0). Judging is ~$8 in total.
-- **GPU:** to be filled in from the efficiency research (expected well under $20).
+- **GPU:** ~1.5–2.5 H100-hours, budget 3–4 (≈ $10–15 incl. a network volume of ~150 GB). Measured inputs: rollouts total 12.0M tokens (max 99k, 9.36M assistant tokens).
+- **GPU recipe** (from `notes/gpu_research.md`): load only blocks 0–40 (`num_hidden_layers=41`, keep `norm` + untied `lm_head` for lenses; 36 GB of weights); plain forwards, right padding with masks, never packing; no prefix sharing (exact but saves only ~15 min); `transformers==5.19.0` + `flash-linear-attention==0.5.2` (fail if the torch fallback activates); sdpa limited to flash/efficient backends; H100 80GB is enough. Test end to end on `Qwen/Qwen3.5-0.8B` (plumbing) and `Qwen/Qwen3.5-9B` (untied head, grouped heads) first.

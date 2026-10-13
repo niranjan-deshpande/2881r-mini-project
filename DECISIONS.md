@@ -24,3 +24,9 @@ One line per non-obvious choice, with the reason. Newest at the bottom of each s
 
 ## Lenses
 - Logit lens + native J-lens + native R-lens readouts for every direction, computed per direction by finite differences at L40 (no full Jacobian); J++ borrowed from the published Qwen3.6-27B lens (layer 40 is J++-fitted), reported only if it agrees with the native readouts. Native J++ refit skipped. — Full Jacobian fits cost 2–5 H100-h plus engineering; per-direction readouts cost ~5–15 GPU-min.
+
+## GPU session
+- Load only blocks 0–40 (truncate `num_hidden_layers`/`layer_types` to 41) rather than run the full model. — Every analysis uses L40 or below; cuts weights 54→36 GB; CPU check showed hooked L40 output bit-identical to the full model.
+- No prefix sharing for synthetic pairs. — Exact for this hybrid model (with deepcopied caches) but only 1.4–1.7× on a ~0.45 GPU-h job; not worth the failure modes.
+- Right padding with attention masks; never pack sequences. — Packing leaks linear-attention/conv state across sequences; left padding is only approximate in bf16.
+- H100 80GB, no chunked prefill. — Longest rollout is 99k tokens; estimated peak ≤ ~60 GB for the 41-block model. Memory test on the longest rollout first anyway.
