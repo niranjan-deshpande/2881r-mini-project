@@ -407,6 +407,162 @@
   "contamination_judge": "none",
   "leakage_target": null
  },
+ "base_loop_comprehension": {
+  "prompt": "gen_base_loop_comprehension.md",
+  "schema": "schema_pair.json",
+  "format": "swe",
+  "n": 200,
+  "variants": {
+   "default": 1
+  },
+  "seed_filter": {
+   "tags_any": [],
+   "languages": [
+    "python"
+   ]
+  },
+  "prefix_len_choices": [
+   4,
+   6
+  ],
+  "cont_len": "9 - prefix_len - 1",
+  "span_location": "think 0.5 / visible 0.5 (base_prose_bullets: visible)",
+  "identical_continuations": false,
+  "lexicon_policy": {
+   "cheat_lexicon": "banned_all",
+   "eval_vocab": "banned_all",
+   "grader_vocab": "banned_all",
+   "hidden_vocab": "banned_all",
+   "skew_words": "balanced_divergent_max_diff_1",
+   "test_vocab_nouns": "banned_all",
+   "test_vocab_outcomes": "banned_all"
+  },
+  "contamination_judge": "none",
+  "leakage_target": null
+ },
+ "base_print_logging": {
+  "prompt": "gen_base_print_logging.md",
+  "schema": "schema_pair.json",
+  "format": "swe",
+  "n": 200,
+  "variants": {
+   "default": 1
+  },
+  "seed_filter": {
+   "tags_any": [],
+   "languages": [
+    "python"
+   ]
+  },
+  "prefix_len_choices": [
+   4,
+   6
+  ],
+  "cont_len": "9 - prefix_len - 1",
+  "span_location": "think 0.5 / visible 0.5 (base_prose_bullets: visible)",
+  "identical_continuations": false,
+  "lexicon_policy": {
+   "cheat_lexicon": "banned_all",
+   "eval_vocab": "banned_all",
+   "grader_vocab": "banned_all",
+   "hidden_vocab": "banned_all",
+   "skew_words": "balanced_divergent_max_diff_1",
+   "test_vocab_nouns": "banned_all",
+   "test_vocab_outcomes": "banned_all"
+  },
+  "contamination_judge": "none",
+  "leakage_target": null
+ },
+ "base_json_yaml": {
+  "prompt": "gen_base_json_yaml.md",
+  "schema": "schema_pair.json",
+  "format": "swe",
+  "n": 200,
+  "variants": {
+   "default": 1
+  },
+  "seed_filter": {
+   "tags_any": []
+  },
+  "prefix_len_choices": [
+   4,
+   6
+  ],
+  "cont_len": "9 - prefix_len - 1",
+  "span_location": "think 0.5 / visible 0.5 (base_prose_bullets: visible)",
+  "identical_continuations": false,
+  "lexicon_policy": {
+   "cheat_lexicon": "banned_all",
+   "eval_vocab": "banned_all",
+   "grader_vocab": "banned_all",
+   "hidden_vocab": "banned_all",
+   "skew_words": "balanced_divergent_max_diff_1",
+   "test_vocab_nouns": "banned_all",
+   "test_vocab_outcomes": "banned_all"
+  },
+  "contamination_judge": "none",
+  "leakage_target": null
+ },
+ "base_metric_imperial": {
+  "prompt": "gen_base_metric_imperial.md",
+  "schema": "schema_pair.json",
+  "format": "swe",
+  "n": 200,
+  "variants": {
+   "default": 1
+  },
+  "seed_filter": {
+   "tags_any": []
+  },
+  "prefix_len_choices": [
+   4,
+   6
+  ],
+  "cont_len": "9 - prefix_len - 1",
+  "span_location": "think 0.5 / visible 0.5 (base_prose_bullets: visible)",
+  "identical_continuations": false,
+  "lexicon_policy": {
+   "cheat_lexicon": "banned_all",
+   "eval_vocab": "banned_all",
+   "grader_vocab": "banned_all",
+   "hidden_vocab": "banned_all",
+   "skew_words": "balanced_divergent_max_diff_1",
+   "test_vocab_nouns": "banned_all",
+   "test_vocab_outcomes": "banned_all"
+  },
+  "contamination_judge": "none",
+  "leakage_target": null
+ },
+ "base_i_we": {
+  "prompt": "gen_base_i_we.md",
+  "schema": "schema_pair.json",
+  "format": "swe",
+  "n": 200,
+  "variants": {
+   "default": 1
+  },
+  "seed_filter": {
+   "tags_any": []
+  },
+  "prefix_len_choices": [
+   4,
+   6
+  ],
+  "cont_len": "9 - prefix_len - 1",
+  "span_location": "think 0.5 / visible 0.5 (base_prose_bullets: visible)",
+  "identical_continuations": false,
+  "lexicon_policy": {
+   "cheat_lexicon": "banned_all",
+   "eval_vocab": "banned_all",
+   "grader_vocab": "banned_all",
+   "hidden_vocab": "banned_all",
+   "skew_words": "balanced_divergent_max_diff_1",
+   "test_vocab_nouns": "banned_all",
+   "test_vocab_outcomes": "banned_all"
+  },
+  "contamination_judge": "none",
+  "leakage_target": null
+ },
  "gc_template": {
   "prompt": "gen_gc_template.md",
   "schema": "schema_gc.json",

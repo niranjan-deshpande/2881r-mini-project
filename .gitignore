@@ -5,3 +5,6 @@ __pycache__/
 data/raw/
 cache/
 *.npz
+data/gen/*/raw/
+data/judge/*/raw/
+data/qwen_tok/
