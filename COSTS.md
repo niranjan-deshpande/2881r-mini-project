@@ -11,6 +11,10 @@ Caps: $60 RunPod, $80 OpenAI + OpenRouter combined. Budget is a cap, not a targe
 | DeepSeek V4 Pro (OpenRouter) | 0.42 | 0.83 | – |
 | DeepSeek V4.1 Flash (OpenRouter) | 0.04 | 0.77 | – |
 
+## Baselines
+- OpenRouter key lifetime usage before this project: $25.05 (2026-10-13). Our OpenRouter spend = usage − 25.05.
+- OpenAI: track via per-request `usage` fields logged by our scripts (and the dashboard).
+
 ## Log
 | Date | Item | Provider | Cost |
 |---|---|---|---|
