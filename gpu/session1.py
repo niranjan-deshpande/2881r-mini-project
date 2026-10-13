@@ -378,12 +378,16 @@ def stage_lenses():
     res = {"logit": lenses.logit_lens(model, tok, V)}
     for mode in ("j", "r"):
         t0 = time.time()
-        res[f"{mode}_lens"] = lenses.fd_lens(model, tok, V, L, texts, mode=mode)
+        res[f"{mode}_lens"] = lenses.fd_lens(model, tok, V, L, texts, mode=mode, eps_frac=0.05)  # 5%: bf16-safe
         log(f"lenses: native {mode}-lens for {len(V)} directions in {time.time() - t0:.0f}s")
     jpp = os.environ.get("JPP_LENS")
     if jpp and Path(jpp).exists():
         J = lenses.load_jpp_layer(jpp, L)
         res["jpp_borrowed"] = lenses.matrix_lens(J, model, tok, V)
+        res["agreement_jpp_vs_j"] = lenses.lens_agreement(res["jpp_borrowed"], res["j_lens"], model=model)
+        res["agreement_jpp_vs_r"] = lenses.lens_agreement(res["jpp_borrowed"], res["r_lens"], model=model)
+        log(f"lenses: borrowed J++ agreement medians: vs J {res['agreement_jpp_vs_j'].get('median')}, "
+            f"vs R {res['agreement_jpp_vs_r'].get('median')}")
     json.dump(res, open(OUT / "lenses.json", "w"), indent=1, default=lambda x: x.tolist() if hasattr(x, "tolist") else str(x))
 
 
