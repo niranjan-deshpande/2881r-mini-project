@@ -48,3 +48,13 @@ One line per non-obvious choice, with the reason. Newest at the bottom of each s
 - Phase 2 judges: GPT-6 Luna + Claude Haiku 5.5. — Brief's Luna plus a different family.
 - Phase 2 transcripts get each passage's id written into its block header ([P5]). — Without it Luna miscounted passages and its quotes landed in other passages (offsets up to ±40); contradiction κ rose 0.65 → 0.79.
 - Phase 2 eval_awareness uses a second, focused stage: sentences containing a cue word (regex) ±1 sentence of context, labeled by both judges; passage positive if any snippet is. — Full-transcript κ was 0.48–0.51 because each judge missed positives the other found; the cue regex caught 27/28 union positives in the pilot; snippet stage gives passage-level κ 0.88.
+
+## Bulk run
+- Phase 2 eval_awareness primary definition: BROAD (explicit evaluation + task-design inference + speculation about hidden grading/scoring); narrow kept as a secondary label. — Niranjan: speculating about hidden grading entails knowing grading is happening; excluding it would be arbitrary.
+- Phase 2 labels only for the impossible splits (conflicting, oneoff); original split not labeled. — No analysis uses them; Niranjan agreed.
+- Bulk generation uses synchronous API calls, not the Batch API. — ~$8 more but finishes in hours rather than up to 24h; deadline Oct 18.
+- eval_awareness and testvocab_swe phrasing: one option sampled per independent axis (eval: 6 referents × 3 certainty levels × 5 triggers × 3 registers × 3 forms = 810 combinations; testvocab: 10 test-word variants × 4 sentence forms). — A single 12-style list would still converge within style at ~17 pairs per style.
+- Duplicate check: an identical (normalised) branch-A span may appear at most twice per direction; extra copies are removed (lowest index kept) and the direction is topped up. — Prevents a direction being dominated by one phrasing; it's a check on wording, applied before any activations exist.
+- Generate 15% extra per direction, then top up any direction still below target. Final n is whatever survives checks, dedupe and contamination (not capped at the target).
+- Pilot pairs are not reused; the bulk run regenerates everything with the final prompts. — All pairs then come from one prompt version.
+- testvocab_noncode: every pair is contamination-judged (not just a 30-pair audit). — Costs ~$0.35; strictly more conservative than the brief.

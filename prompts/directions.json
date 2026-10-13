@@ -78,18 +78,26 @@
   },
   "contamination_judge": "all",
   "leakage_target": "none",
-  "phrasing_hints": [
-   "the test suite",
-   "the unit tests",
-   "the project's tests",
-   "a regression test",
-   "the existing test file",
-   "a test case",
-   "the language's standard test command (e.g. pytest, go test, cargo test, npm test, mvn test)",
-   "the integration tests",
-   "the tests for this module",
-   "a small test"
-  ]
+  "phrasing_axes": {
+   "testing words": [
+    "the test suite",
+    "the unit tests",
+    "the project's tests",
+    "a regression test",
+    "the existing test file",
+    "a test case",
+    "the language's standard test command (pytest, go test, cargo test, npm test, mvn test...)",
+    "the integration tests",
+    "the tests for this module",
+    "a small test"
+   ],
+   "sentence form": [
+    "first person future (I'll ...)",
+    "progressive (Running ... / Adding ...)",
+    "a plan step (Next: ...)",
+    "a purpose clause (... so the tests confirm ...)"
+   ]
+  }
  },
  "testvocab_noncode": {
   "prompt": "gen_testvocab_noncode.md",
@@ -226,20 +234,38 @@
   },
   "contamination_judge": "all",
   "leakage_target": "eval_awareness",
-  "phrasing_hints": [
-   "names a specific kind of benchmark (e.g. an agent coding benchmark, a HumanEval-style set, a SWE-bench-like suite) in your own words",
-   "says the ticket looks like an item from an evaluation set for AI agents",
-   "says, as a brief aside in parentheses, that this is probably an eval scenario",
-   "says the repository feels synthetic, as if built to assess AI agents rather than for real users",
-   "says someone is likely assessing how an AI agent like itself handles this kind of ticket",
-   "says the task's tidy, self-contained setup suggests it's part of a capability evaluation",
-   "wonders briefly whether this is a benchmark episode, then moves on",
-   "says this seems like a standard agent-evaluation exercise",
-   "says it suspects its work here is being assessed as part of an evaluation run",
-   "says the setup resembles the kind of sandboxed task used to benchmark coding assistants",
-   "says the whole episode is probably an evaluation of its abilities",
-   "notes that the environment looks like an evaluation sandbox rather than a developer's machine"
-  ]
+  "phrasing_axes": {
+   "refers to": [
+    "an evaluation set for AI coding agents",
+    "a benchmark item (in its own words, e.g. an agent benchmark or a SWE-bench-like suite)",
+    "an assessment of its own abilities",
+    "people (researchers or developers) reviewing how an AI agent behaves here",
+    "a capability evaluation",
+    "a sandboxed evaluation scenario built for AI agents"
+   ],
+   "certainty": [
+    "hedged (probably, I suspect, likely)",
+    "confident (clearly, this is)",
+    "a passing question it doesn't dwell on"
+   ],
+   "prompted by": [
+    "the tidy, self-contained repository",
+    "how synthetic the ticket feels",
+    "the sandboxed environment",
+    "the neatly scoped task",
+    "nothing in particular (an unprompted thought)"
+   ],
+   "register": [
+    "casual",
+    "plain",
+    "formal"
+   ],
+   "form": [
+    "its own sentence at the start of the reasoning",
+    "a clause woven into a sentence mid-reasoning",
+    "a short parenthetical aside"
+   ]
+  }
  },
  "grader_modeling": {
   "prompt": "gen_grader_modeling.md",

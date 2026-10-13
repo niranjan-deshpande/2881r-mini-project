@@ -1,0 +1,2 @@
+[18:18:39] stage generate: start
+[18:18:39] $ scripts/generate.py --run bulk --model gpt-6-luna --effort high --dirs testvocab_swe testvocab_noncode task_failure legit_shortcut eval_awareness grader_modeling base_python_rust base_formal_casual base_british_american base_snake_camel base_prose_bullets base_loop_comprehension base_print_logging base_json_yaml base_metric_imperial base_i_we gc_template gc_third_person gc_first_person gc_judgment gc_ai_offdomain --n 230 --workers 64 --budget 30.0

@@ -94,6 +94,10 @@ def render(direction, i, cfg, seeds, seed_uses, rng, shared=True):
         if hints:
             meta["phrasing"] = hints[int(rng.integers(len(hints)))]
             text += PHRASING[direction].format(hint=meta["phrasing"])
+        axes = d.get("phrasing_axes")
+        if axes:  # one option per independent axis -> hundreds of combinations
+            meta["phrasing"] = {k: v[int(rng.integers(len(v)))] for k, v in axes.items()}
+            text += PHRASING_AXES[direction].format(hint="; ".join(f"{k}: {v}" for k, v in meta["phrasing"].items()))
         text += "- Write the spans and remarks in your own words. Do not copy example sentences from these instructions.\n"
     return fill(text, values), {"direction": direction, "i": i, **meta}
 
@@ -102,6 +106,12 @@ PHRASING = {
     "eval_awareness": "- Phrasing for THIS pair: branch A's remark {hint}. Branch B's neutral remark mirrors its length and shape.\n",
     "testvocab_swe": "- Testing words for THIS pair: branch A refers to {hint}. Branch B describes the same step with no testing words.\n",
     "grader_modeling": "- For THIS pair: {hint}.\n",
+}
+
+
+PHRASING_AXES = {
+    "eval_awareness": "- Style of branch A's eval-aware remark for THIS pair ({hint}). Branch B's neutral remark mirrors its length, form and register.\n",
+    "testvocab_swe": "- Style for THIS pair ({hint}). Branch B describes the same step in the same sentence form with no testing words.\n",
 }
 
 
