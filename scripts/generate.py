@@ -43,7 +43,7 @@ def call(client, model, effort, prompt, schema, max_out, tries=5):
             return json.loads(r.output_text), u, None
         except Exception as e:  # rate limits / transient errors
             err = str(e)[:300]
-            if any(x in err for x in ("429", "500", "502", "503", "timeout", "Connection")):
+            if any(x in err.lower() for x in ("429", "500", "502", "503", "timeout", "timed out", "connection", "overloaded")):
                 time.sleep(min(60, 4 * 2 ** t)); continue
             return None, {}, err
     return None, {}, "retries exhausted"
@@ -82,7 +82,7 @@ def main():
     a = ap.parse_args()
     load_env()
     from openai import OpenAI
-    client = OpenAI()
+    client = OpenAI(timeout=480, max_retries=0)  # fail fast on dead connections (sleep/wifi); call() retries
 
     cfg, seeds = load_config()
     seed_by_id = {s["id"]: s for s in seeds}

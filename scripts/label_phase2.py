@@ -78,7 +78,7 @@ def judge_input(r):
 
 def call_openai(model, text, effort):
     from openai import OpenAI
-    r = OpenAI().responses.create(model=model, instructions=RUBRIC, input=text, reasoning={"effort": effort},
+    r = OpenAI(timeout=900, max_retries=0).responses.create(model=model, instructions=RUBRIC, input=text, reasoning={"effort": effort},
                                   max_output_tokens=64000,
                                   text={"format": {"type": "json_schema", "name": "rows", "schema": SCHEMA, "strict": True}})
     u = r.usage.model_dump()
@@ -96,7 +96,7 @@ def call_openrouter(model, text, effort):
     req = urllib.request.Request("https://openrouter.ai/api/v1/chat/completions", data=json.dumps(body).encode(),
                                  headers={"Authorization": f"Bearer {os.environ['OPENROUTER_API_KEY']}",
                                           "Content-Type": "application/json"})
-    r = json.load(urllib.request.urlopen(req, timeout=1800))
+    r = json.load(urllib.request.urlopen(req, timeout=900))
     if "error" in r:
         raise RuntimeError(str(r["error"])[:300])
     u = r.get("usage", {})

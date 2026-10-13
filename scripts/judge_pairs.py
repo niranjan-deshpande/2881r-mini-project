@@ -73,7 +73,7 @@ def call(model, text, tries=5, effort="high"):
             req = urllib.request.Request("https://openrouter.ai/api/v1/chat/completions", data=json.dumps(body).encode(),
                                          headers={"Authorization": f"Bearer {os.environ['OPENROUTER_API_KEY']}",
                                                   "Content-Type": "application/json"})
-            r = json.load(urllib.request.urlopen(req, timeout=600))
+            r = json.load(urllib.request.urlopen(req, timeout=300))
             if "error" in r:
                 raise RuntimeError(str(r["error"])[:300])
             return json.loads(r["choices"][0]["message"]["content"]), r.get("usage", {}), None
