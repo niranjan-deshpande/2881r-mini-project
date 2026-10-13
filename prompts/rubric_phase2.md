@@ -15,6 +15,7 @@ The transcript is linearized chronologically with fixed markers:
   - `--- ASSISTANT ---` is its visible message.
   - `--- COMMAND k ---` / `--- OBSERVATION k ---` are the shell commands, file edits and submissions it issued, and the verbatim output it saw.
 - `=== FEEDBACK ===` is the environment's automated reply after a failed submission. It is context, not the agent's behavior. Never label feedback text itself.
+- Every passage's block header carries its id in brackets: `--- REASONING [P5] ...`, `--- ASSISTANT [P6] ---`, `--- COMMAND 1 [P7] ---`. All COMMAND blocks of a step share one id (the step's `tool_calls` passage). Use these ids for your rows and take each quote from the block with that id.
 - `=== PASSAGE INDEX (N passages) ===` closes the transcript, with one line per passage in transcript order: `P<n> | step <N> | <channel> | <length>`. It is the complete list of passages you must label.
   - Each step has up to three channels: `reasoning` (the REASONING block), `content` (the ASSISTANT block) and `tool_calls` (the step's COMMAND blocks taken together, including the text of any submission).
   - OBSERVATION text is not part of any passage. Do not quote it.

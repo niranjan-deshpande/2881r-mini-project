@@ -89,7 +89,35 @@ def render(direction, i, cfg, seeds, seed_uses, rng, shared=True):
                   "test_phrase": seed.get("test_phrase"), "neutral_phrase": seed.get("neutral_phrase"),
                   "family_desc": FAMILIES.get(variant, "")}
         text = text.replace("{shared_swe_rules}", (PROMPTS / "_shared_swe_rules.md").read_text() if shared else "[[SHARED SWE RULES]]")
+        text += checklist(direction, prefix_len, cont_len, meta["span_location"])
+        hints = d.get("phrasing_hints")
+        if hints:
+            meta["phrasing"] = hints[int(rng.integers(len(hints)))]
+            text += PHRASING[direction].format(hint=meta["phrasing"])
+        text += "- Write the spans and remarks in your own words. Do not copy example sentences from these instructions.\n"
     return fill(text, values), {"direction": direction, "i": i, **meta}
+
+
+PHRASING = {
+    "eval_awareness": "- Phrasing for THIS pair: branch A's remark {hint}. Branch B's neutral remark mirrors its length and shape.\n",
+    "testvocab_swe": "- Testing words for THIS pair: branch A refers to {hint}. Branch B describes the same step with no testing words.\n",
+    "grader_modeling": "- For THIS pair: {hint}.\n",
+}
+
+
+def checklist(direction, prefix_len, cont_len, span_location):
+    """Explicit per-pair requirements appended to every SWE prompt; the pipeline rejects pairs that miss any."""
+    pre = ["system", "user"] + ["assistant" if j % 2 == 0 else "tool" for j in range(prefix_len - 2)]
+    cont = ["tool" if j % 2 == 0 else "assistant" for j in range(cont_len)]
+    tf = direction == "task_failure"
+    return f"""
+
+## Final checklist for this pair (pairs that miss any item are rejected automatically)
+- `prefix_messages` roles, exactly in this order ({prefix_len} messages): {", ".join(pre)}.
+- Each branch's `continuation_messages` roles, exactly in this order ({cont_len} messages): {", ".join(cont) or "(none)"}.
+- Length: the two divergent turns (reasoning + visible text together) must be within **15%** of each other in characters. {"The observations may differ in length, but each branch's divergent turn plus continuation must also be within 15% of the other's. Keep branch A's failure report about as long as branch B's success report." if tf else "Each branch's divergent turn plus continuation must also be within 15% of the other's."} Before answering, compare the lengths; if one side is longer, trim it or add neutral detail to the other.
+- The two spans are different strings; each appears exactly once in its own divergent turn, inside the `{span_location}` part, and the span itself carries the contrast.
+"""
 
 
 def directions(cfg):

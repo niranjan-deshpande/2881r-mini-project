@@ -49,6 +49,25 @@ def call(client, model, effort, prompt, schema, max_out, tries=5):
     return None, {}, "retries exhausted"
 
 
+REPAIR = """
+
+## Your previous answer
+{prev}
+
+## It failed these automatic checks
+{fails}
+
+Return the full corrected JSON object. Change only what is needed to fix these failures and keep everything else \
+identical. For length failures, trim the longer side or add neutral detail to the shorter side so the ratio is at most 1.15."""
+
+
+def run_checks(obj, d, meta, cfg, seed_by_id):
+    try:
+        return check_gc(obj, d) if cfg[d]["format"] == "gc" else check_swe(obj, d, meta, seed_by_id.get(meta.get("seed_id")))
+    except Exception as e:
+        return [f"check crashed: {type(e).__name__}: {e}"]
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--run", required=True)
@@ -58,6 +77,7 @@ def main():
     ap.add_argument("--n", type=int, default=20)
     ap.add_argument("--workers", type=int, default=16)
     ap.add_argument("--max-output-tokens", type=int, default=32000)
+    ap.add_argument("--no-repair", dest="repair", action="store_false", help="skip the one-round repair call")
     ap.add_argument("--budget", type=float, default=5.0, help="stop submitting new calls once spend exceeds this ($)")
     a = ap.parse_args()
     load_env()
@@ -94,6 +114,17 @@ def main():
         spent[0] += c
         rec = {"meta": meta, "model": a.model, "effort": a.effort, "obj": obj, "usage": u, "error": err, "cost": c,
                "prompt_sha": hashlib.sha256(prompt.encode()).hexdigest()[:16]}
+        if obj is not None and a.repair:
+            first = run_checks(obj, d, meta, cfg, seed_by_id)
+            rec["first_pass_fails"] = first
+            if first and not any(x.startswith("check crashed") for x in first):
+                fixed, u2, err2 = call(client, a.model, a.effort, prompt + REPAIR.format(
+                    prev=json.dumps(obj, indent=1), fails="\n".join(f"- {x}" for x in first)), schema, a.max_output_tokens)
+                c2 = cost(a.model, u2) if u2 else 0.0
+                spent[0] += c2; rec["cost"] += c2
+                rec["repair"] = {"usage": u2, "error": err2, "cost": c2}
+                if fixed is not None:
+                    rec["obj_first"], rec["obj"] = obj, fixed
         f.write_text(json.dumps(rec))
         return rec
 
@@ -101,6 +132,8 @@ def main():
     with cf.ThreadPoolExecutor(a.workers) as ex:
         recs = list(ex.map(run, jobs))
     print(f"{len(recs)} calls in {time.time() - t0:.0f}s, new spend ${spent[0]:.3f}")
+    # pairs.jsonl / summary cover every pair saved in this run directory, not just this invocation's jobs
+    recs = [json.loads(f.read_text()) for f in sorted((out / "raw").glob("*.json"))]
 
     summary, rows = {}, []
     for rec in recs:
@@ -116,11 +149,10 @@ def main():
             s["fail_reasons"][f"api: {rec['error'][:60]}"] += 1
             continue
         obj = rec["obj"]
-        try:
-            fails = check_gc(obj, d) if cfg[d]["format"] == "gc" else check_swe(obj, d, m, seed_by_id.get(m.get("seed_id")))
-        except Exception as e:
-            fails = [f"check crashed: {type(e).__name__}: {e}"]
+        fails = run_checks(obj, d, m, cfg, seed_by_id)
         s["pass"] += not fails
+        if "first_pass_fails" in rec:
+            s["first_pass_pass"] = s.get("first_pass_pass", 0) + (not rec["first_pass_fails"])
         for x in fails:
             key = x.split(":")[0]
             s["fail_reasons"][key] = s["fail_reasons"].get(key, 0) + 1
@@ -138,7 +170,7 @@ def main():
     json.dump(summary, open(out / "summary.json", "w"), indent=1)
     tot = sum(s["cost"] for s in summary.values())
     for d, s in summary.items():
-        print(f"{d:24s} pass {s['pass']}/{s['n']}  api_fail {s['api_fail']}  ${s['cost']:.3f}  "
+        print(f"{d:24s} first-pass {s.get('first_pass_pass', '-')}/{s['n']}  final pass {s['pass']}/{s['n']}  api_fail {s['api_fail']}  ${s['cost']:.3f}  "
               f"out {s['out_tokens']['mean']}  reasoning {s['reasoning_tokens']['mean']}  {s['fail_reasons']}")
     print(f"total cost of all records in this run: ${tot:.3f}")
 

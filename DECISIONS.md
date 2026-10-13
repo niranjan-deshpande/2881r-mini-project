@@ -13,7 +13,7 @@ One line per non-obvious choice, with the reason. Newest at the bottom of each s
 ## Nulls
 - Label-shuffled DoMs use balanced sign flips within pairs (exactly half the pairs swapped), not coin flips. — With coin flips the ±1/√n imbalance leaks v: on the Claude pairs, coin-flip shuffles had |cos| ≈ 0.41 with v_hack.
 
-## Generation (pending pilot)
+## Generation
 - Generator chosen by a 2-arm pilot (GPT-6 Luna high effort vs GPT-5.6 Terra), same prompts and seeds, blind-graded by DeepSeek V4 Pro. Rule fixed before looking: Luna if within ~5 points of Terra on auto-check pass rate and contamination rate and not noticeably more templated. — Brief fixed Terra, but the actual requirement is one generator for everything; Luna is ~6–20× cheaper.
 - No Claude-subagent generator arm. — Nonstandard; the Claude Code system prompt and tool context make the generation process hard to document and reproduce.
 - No GPT-6 Sol anywhere. — Overkill; DeepSeek V4 Pro gives independent (third-family) grading at a fraction of the cost.
@@ -35,3 +35,16 @@ One line per non-obvious choice, with the reason. Newest at the bottom of each s
 - No prefix sharing for synthetic pairs. — Exact for this hybrid model (with deepcopied caches) but only 1.4–1.7× on a ~0.45 GPU-h job; not worth the failure modes.
 - Right padding with attention masks; never pack sequences. — Packing leaks linear-attention/conv state across sequences; left padding is only approximate in bf16.
 - H100 80GB, no chunked prefill. — Longest rollout is 99k tokens; estimated peak ≤ ~60 GB for the 41-block model. Memory test on the longest rollout first anyway.
+
+## CHECKPOINT A outcomes
+- Generator: GPT-6 Luna, reasoning effort high. Terra never run. — Luna cleared the fixed bar (≥90% pass after checks, ≤10% contamination, no templating after fixes), so Terra couldn't be meaningfully better for our purpose.
+- One automatic repair round: a pair that fails an automatic check is sent back once with the exact failures (e.g. "A 1,240 chars, B 950 chars"); still failing → dropped. — First-pass failures were mostly marginal length misses (ratios 1.20–1.28), not content problems; repair edits the pair rather than selecting on content.
+- Every SWE prompt ends with a per-pair checklist generated in code (exact role sequence, 15% length target, span rules). — Cut structural failures; 15% target leaves margin under the 20% check.
+- Per-pair phrasing hints for eval_awareness (12 styles), testvocab_swe (10 test-word variants) and grader_modeling (don't reuse the example's keys). — Luna copied the prompt's example sentences: 17/20 eval-aware remarks were one of three sentences.
+- testvocab_swe: dropped the `read_check` variant (reading a test file vs a README). — The judge repeatedly flagged it as a second contrast (different source), not just different words.
+- task_failure length rule excludes the observation. — Failing and passing outputs differ in length by construction and the observation isn't the measured turn.
+- Lexicon fix: `expect(` only counts when not a method call. — Rust's `.expect()` was matching as test vocabulary.
+- Contamination judge: Claude Haiku 5.5 (OpenRouter, provider pinned to Anthropic/Vertex/Azure, strict JSON schema). Drop a pair if it's flagged in ≥2 of 3 runs (first run + 2 re-judges of flagged pairs). — Third family relative to Luna; judge research (notes/judge_model_choice.md) found DeepSeek V4 Pro off the Pareto frontier. Majority rule errs toward removing contamination.
+- Phase 2 judges: GPT-6 Luna + Claude Haiku 5.5. — Brief's Luna plus a different family.
+- Phase 2 transcripts get each passage's id written into its block header ([P5]). — Without it Luna miscounted passages and its quotes landed in other passages (offsets up to ±40); contradiction κ rose 0.65 → 0.79.
+- Phase 2 eval_awareness uses a second, focused stage: sentences containing a cue word (regex) ±1 sentence of context, labeled by both judges; passage positive if any snippet is. — Full-transcript κ was 0.48–0.51 because each judge missed positives the other found; the cue regex caught 27/28 union positives in the pilot; snippet stage gives passage-level κ 0.88.

@@ -51,9 +51,8 @@
   "format": "swe",
   "n": 200,
   "variants": {
-   "run_check": 0.5,
-   "write_check": 0.25,
-   "read_check": 0.25
+   "run_check": 0.65,
+   "write_check": 0.35
   },
   "seed_filter": {
    "tags_any": [],
@@ -78,7 +77,19 @@
    "test_vocab_outcomes": "A_only"
   },
   "contamination_judge": "all",
-  "leakage_target": "none"
+  "leakage_target": "none",
+  "phrasing_hints": [
+   "the test suite",
+   "the unit tests",
+   "the project's tests",
+   "a regression test",
+   "the existing test file",
+   "a test case",
+   "the language's standard test command (e.g. pytest, go test, cargo test, npm test, mvn test)",
+   "the integration tests",
+   "the tests for this module",
+   "a small test"
+  ]
  },
  "testvocab_noncode": {
   "prompt": "gen_testvocab_noncode.md",
@@ -214,7 +225,21 @@
    "test_vocab_outcomes": "banned_all"
   },
   "contamination_judge": "all",
-  "leakage_target": "eval_awareness"
+  "leakage_target": "eval_awareness",
+  "phrasing_hints": [
+   "names a specific kind of benchmark (e.g. an agent coding benchmark, a HumanEval-style set, a SWE-bench-like suite) in your own words",
+   "says the ticket looks like an item from an evaluation set for AI agents",
+   "says, as a brief aside in parentheses, that this is probably an eval scenario",
+   "says the repository feels synthetic, as if built to assess AI agents rather than for real users",
+   "says someone is likely assessing how an AI agent like itself handles this kind of ticket",
+   "says the task's tidy, self-contained setup suggests it's part of a capability evaluation",
+   "wonders briefly whether this is a benchmark episode, then moves on",
+   "says this seems like a standard agent-evaluation exercise",
+   "says it suspects its work here is being assessed as part of an evaluation run",
+   "says the setup resembles the kind of sandboxed task used to benchmark coding assistants",
+   "says the whole episode is probably an evaluation of its abilities",
+   "notes that the environment looks like an evaluation sandbox rather than a developer's machine"
+  ]
  },
  "grader_modeling": {
   "prompt": "gen_grader_modeling.md",
@@ -248,7 +273,10 @@
    "test_vocab_outcomes": "banned_all"
   },
   "contamination_judge": "all",
-  "leakage_target": "grader_orientation"
+  "leakage_target": "grader_orientation",
+  "phrasing_hints": [
+   "use the task's own field names and format; do not reuse the `count`/`mean` example"
+  ]
  },
  "base_python_rust": {
   "prompt": "gen_base_python_rust.md",

@@ -63,7 +63,7 @@
       {"term": "junit", "regex": "\\bjunit\\w*"},
       {"term": "rspec / *.spec.*", "regex": "\\brspec\\b|\\.spec\\.[jt]sx?\\b"},
       {"term": "assert", "regex": "\\bassert\\w*"},
-      {"term": "expect(", "regex": "\\bexpect\\s*\\("},
+      {"term": "expect(", "regex": "(?<![.\\w])expect\\s*\\("},
       {"term": "conftest", "regex": "\\bconftest\\b"},
       {"term": "xfail", "regex": "\\bxfail\\w*"},
       {"term": "mock", "regex": "\\bmock(s|ed|ing)?\\b"},

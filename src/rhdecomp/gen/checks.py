@@ -170,11 +170,13 @@ def check_swe(obj, direction, meta, seed=None):
         return max(x, y) / max(1, min(x, y))
     la, lb = len(divergent_text(A)), len(divergent_text(B))
     if ratio(la, lb) > 1.2:
-        f.append(f"length: divergent turn ratio {ratio(la, lb):.2f}")
+        f.append(f"length: divergent turn ratio {ratio(la, lb):.2f} (A {la} chars, B {lb} chars; must be <= 1.20)")
     R = _region_texts(obj, direction)
-    ta, tb = len(R["div_a"]) + len(R["rest_a"]), len(R["div_b"]) + len(R["rest_b"])
+    obs = {s: len(obj[f"branch_{s}"].get("observation", "")) + (1 if direction == "task_failure" else 0) for s in "ab"}
+    ta = len(R["div_a"]) + len(R["rest_a"]) - (obs["a"] if direction == "task_failure" else 0)
+    tb = len(R["div_b"]) + len(R["rest_b"]) - (obs["b"] if direction == "task_failure" else 0)
     if ratio(ta, tb) > 1.2:
-        f.append(f"length: branch-specific ratio {ratio(ta, tb):.2f}")
+        f.append(f"length: divergent turn + continuation ratio {ratio(ta, tb):.2f} (A {ta} chars, B {tb} chars; must be <= 1.20)")
     f += check_lexicon(obj, direction, seed, meta["variant"])
     return f
 

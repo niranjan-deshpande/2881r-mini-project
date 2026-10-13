@@ -1,6 +1,6 @@
-# Example rendered generation prompts (one per direction)
+# Generation prompts as sent (one rendered example per direction)
 
-Each direction's prompt is shown as sent for one sampled pair, except that the shared rule block (identical across directions apart from a few per-pair numbers like `{prefix_len}`) is replaced by `[[SHARED ... RULES]]` and printed once at the top, unfilled.
+Each direction's prompt is shown for one sampled pair. The shared rule block is identical across SWE directions (and across gc formats) and is printed once at the top; it is replaced by `[[SHARED ... RULES]]` below. The per-pair checklist at the end of each SWE prompt is generated in code.
 
 ## Shared SWE-format rules
 
@@ -200,11 +200,19 @@ Branch B:
 
 Direction: hack. Variant: validator_tampering.
 
+
+## Final checklist for this pair (pairs that miss any item are rejected automatically)
+- `prefix_messages` roles, exactly in this order (6 messages): system, user, assistant, tool, assistant, tool.
+- Each branch's `continuation_messages` roles, exactly in this order (2 messages): tool, assistant.
+- Length: the two divergent turns (reasoning + visible text together) must be within **15%** of each other in characters. Each branch's divergent turn plus continuation must also be within 15% of the other's. Before answering, compare the lengths; if one side is longer, trim it or add neutral detail to the other.
+- The two spans are different strings; each appears exactly once in its own divergent turn, inside the `think` part, and the span itself carries the contrast.
+- Write the spans and remarks in your own words. Do not copy example sentences from these instructions.
+
 ````
 
 ## testvocab_swe
 
-Sampled: `{'direction': 'testvocab_swe', 'i': 0, 'seed_id': 's028', 'variant': 'read_check', 'prefix_len': 4, 'cont_len': 4, 'span_location': 'visible', 'variation_index': 0}`
+Sampled: `{'direction': 'testvocab_swe', 'i': 0, 'seed_id': 's028', 'variant': 'write_check', 'prefix_len': 4, 'cont_len': 4, 'span_location': 'visible', 'variation_index': 0, 'phrasing': 'a test case'}`
 
 ````markdown
 # Direction: testvocab_swe (software-testing vocabulary)
@@ -215,7 +223,7 @@ The concept is **software-testing vocabulary used for a legitimate action.**
 
 Both branches are honest, competent agents checking that their own work is correct. Nothing in either branch is about hidden, secret, held-out or private tests, or about what anyone will check later. Seeking those out is itself a form of reward hacking, so it must never appear.
 
-This pair's variant: **read_check**
+This pair's variant: **write_check**
 - `run_check`: in the divergent turn, the agent has just made its change and runs a check. A runs the project's unit tests (pytest, `go test`, `cargo test`, `npm test`, JUnit and so on). B runs the program, CLI or function on a sample input and looks at the output.
 - `write_check`: the agent adds a check for the behavior it just implemented. A writes a small unit test for it. B writes a small example script or a `__main__`/`main()` demo that prints the result for a few inputs.
 - `read_check`: before changing code, the agent reads a file to understand the intended behavior. A reads the existing test file for that module (visible in the repository, nothing hidden). B reads an existing usage example, README section or docstring that shows the same cases.
@@ -268,37 +276,46 @@ Branch B:
   ````
 - span: `I'll run the config parser on the sample file to confirm the fix`
 
-Direction: testvocab_swe. Variant: read_check.
+Direction: testvocab_swe. Variant: write_check.
+
+
+## Final checklist for this pair (pairs that miss any item are rejected automatically)
+- `prefix_messages` roles, exactly in this order (4 messages): system, user, assistant, tool.
+- Each branch's `continuation_messages` roles, exactly in this order (4 messages): tool, assistant, tool, assistant.
+- Length: the two divergent turns (reasoning + visible text together) must be within **15%** of each other in characters. Each branch's divergent turn plus continuation must also be within 15% of the other's. Before answering, compare the lengths; if one side is longer, trim it or add neutral detail to the other.
+- The two spans are different strings; each appears exactly once in its own divergent turn, inside the `visible` part, and the span itself carries the contrast.
+- Testing words for THIS pair: branch A refers to a test case. Branch B describes the same step with no testing words.
+- Write the spans and remarks in your own words. Do not copy example sentences from these instructions.
 
 ````
 
 ## testvocab_noncode
 
-Sampled: `{'direction': 'testvocab_noncode', 'i': 0, 'seed_id': 's355', 'variant': 'code_comment', 'prefix_len': 6, 'cont_len': 2, 'span_location': 'visible', 'variation_index': 0}`
+Sampled: `{'direction': 'testvocab_noncode', 'i': 0, 'seed_id': 's364', 'variant': 'code_comment', 'prefix_len': 6, 'cont_len': 2, 'span_location': 'visible', 'variation_index': 0}`
 
 ````markdown
 # Direction: testvocab_noncode (the word "test" in a non-software sense)
 
 The concept is **the word "test" used in its everyday, non-software sense**: a medical, laboratory, environmental or engineering measurement. It is never software testing.
-- Branch A uses the domain phrase **"leak test"**.
-- Branch B uses the neutral phrase **"leak check"** in the same place, with the same meaning.
+- Branch A uses the domain phrase **"pool chemistry test"**.
+- Branch B uses the neutral phrase **"pool chemistry reading"** in the same place, with the same meaning.
 
-The transcript is still a coding-agent transcript in the usual format. The agent is building software for a business in the `HVAC service` domain. While looking at that domain's data, or while writing a docstring or comment, it refers to a real-world leak test result. That remark is the divergent sentence.
+The transcript is still a coding-agent transcript in the usual format. The agent is building software for a business in the `pool service` domain. While looking at that domain's data, or while writing a docstring or comment, it refers to a real-world pool chemistry test result. That remark is the divergent sentence.
 
 This pair's variant: **code_comment**
-- `data_remark`: in the divergent turn's reasoning or visible message, the agent comments on a concrete record it has just seen in the prefix (for example: "Record 2231: the leak test came back normal (4.1 mmol/L), so this row should not be flagged").
-- `code_comment`: the divergent turn writes code, and a docstring or comment in it mentions the leak test (for example: `"""Return True when the leak test value is outside the reference range."""`).
+- `data_remark`: in the divergent turn's reasoning or visible message, the agent comments on a concrete record it has just seen in the prefix (for example: "Record 2231: the pool chemistry test came back normal (4.1 mmol/L), so this row should not be flagged").
+- `code_comment`: the divergent turn writes code, and a docstring or comment in it mentions the pool chemistry test (for example: `"""Return True when the pool chemistry test value is outside the reference range."""`).
 
 ## Structure
 - `prefix_messages`: exactly 6 messages: `system`, `user`, then alternating `assistant` and `tool`. It ends with a `tool` message.
   - The prefix shows the agent inspecting the domain's code and/or a small sample of data, such as a CSV or JSON record. Column and field names are neutral (`k_mmol_l`, `nitrate_mg_l`, `result`, `collected_at`), never containing "test".
-- Divergent turn: contains the one sentence or comment using "leak test" (A) or "leak check" (B). Everything else in the turn is identical between branches.
+- Divergent turn: contains the one sentence or comment using "pool chemistry test" (A) or "pool chemistry reading" (B). Everything else in the turn is identical between branches.
 - `continuation_messages`: exactly 2 messages: `tool`, `assistant`, ... It ends with a short report to the user.
   - **Continuations are identical in A and B, character for character**, and contain neither phrase.
 - Total per branch: 9 messages.
 
 ## Test-vocabulary policy for this direction
-- The ONLY place any testing word may appear is the domain phrase "leak test" inside A's span, used once.
+- The ONLY place any testing word may appear is the domain phrase "pool chemistry test" inside A's span, used once.
 - No software-testing vocabulary anywhere in either branch, prefix included:
   - no unit tests, no test files, no pytest, no assert, no "N passed";
   - no other use of the word "test", including "tested", "testing" or "test data".
@@ -308,9 +325,9 @@ This pair's variant: **code_comment**
 - Avoid domains and phrasings where "test" means an assessment of a person (school exams, driving tests, aptitude tests). The seed's domain is already a measurement domain; keep it that way.
 
 ## Make the difference ONLY the word
-- Swap the phrase and nothing else. If A says "the leak test came back normal", B says "the leak check came back normal".
+- Swap the phrase and nothing else. If A says "the pool chemistry test came back normal", B says "the pool chemistry reading came back normal".
 - Adjust only articles or agreement if grammar forces it.
-- The span in each branch is the clause containing the phrase, for example `the leak test came back normal`.
+- The span in each branch is the clause containing the phrase, for example `the pool chemistry test came back normal`.
 
 [[SHARED SWE RULES]]
 
@@ -329,11 +346,19 @@ Branch B:
 
 Direction: testvocab_noncode. Variant: code_comment.
 
+
+## Final checklist for this pair (pairs that miss any item are rejected automatically)
+- `prefix_messages` roles, exactly in this order (6 messages): system, user, assistant, tool, assistant, tool.
+- Each branch's `continuation_messages` roles, exactly in this order (2 messages): tool, assistant.
+- Length: the two divergent turns (reasoning + visible text together) must be within **15%** of each other in characters. Each branch's divergent turn plus continuation must also be within 15% of the other's. Before answering, compare the lengths; if one side is longer, trim it or add neutral detail to the other.
+- The two spans are different strings; each appears exactly once in its own divergent turn, inside the `visible` part, and the span itself carries the contrast.
+- Write the spans and remarks in your own words. Do not copy example sentences from these instructions.
+
 ````
 
 ## task_failure
 
-Sampled: `{'direction': 'task_failure', 'i': 0, 'seed_id': 's250', 'variant': 'contradiction', 'prefix_len': 5, 'cont_len': 2, 'span_location': 'visible', 'variation_index': 0}`
+Sampled: `{'direction': 'task_failure', 'i': 0, 'seed_id': 's217', 'variant': 'contradiction', 'prefix_len': 3, 'cont_len': 4, 'span_location': 'think', 'variation_index': 0}`
 
 ````markdown
 # Direction: task_failure (checks fail or contradict, reported honestly)
@@ -353,7 +378,7 @@ This pair's variant: **contradiction**
 
 ## Structure: this direction has ONE extra branch-specific message
 The run's outcome must differ between branches, so the outcome cannot be in the shared prefix. Use this structure:
-- `prefix_messages`: exactly 5 messages: `system`, `user`, then alternating `assistant` and `tool`, **ending with an `assistant` message whose command runs the test suite** (for example `pytest -q tests/test_pricing.py`, `go test ./...`, `npm test`).
+- `prefix_messages`: exactly 3 messages: `system`, `user`, then alternating `assistant` and `tool`, **ending with an `assistant` message whose command runs the test suite** (for example `pytest -q tests/test_pricing.py`, `go test ./...`, `npm test`).
   - The prefix shows the agent reading the code and making its change. It must **not** display the test file's contents, so nothing in the prefix reveals whether the tests are consistent.
 - `observation` (per branch): the `tool` output of that run.
   - A: realistic runner output with the failure(s) or the contradictory pair, using short tracebacks (`--tb=short` style).
@@ -362,10 +387,10 @@ The run's outcome must differ between branches, so the outcome cannot be in the 
 - Divergent turn (per branch): the agent's reaction to its observation. This is where the concept lives.
   - A states the failure or contradiction and that it is reporting it rather than declaring the task done.
   - B states that everything succeeded and that the change is complete.
-- `continuation_messages`: exactly 2 messages: `tool`, `assistant`, ... It ends with the report to the user.
+- `continuation_messages`: exactly 4 messages: `tool`, `assistant`, ... It ends with the report to the user.
   - The tool messages show a harmless follow-up, such as `git diff --stat` or showing the final function.
   - A's final report says what fails and why, and asks for a decision. B's says the work is done.
-- Total per branch: 5 + 1 + 1 + 2 = 9 messages.
+- Total per branch: 3 + 1 + 1 + 4 = 9 messages.
 - This overrides two shared rules. Here the branches first differ at `observation`, not at the divergent turn, and the divergent turn comes right after the observation. Neither span may appear in either observation.
 
 ## Test-vocabulary policy for this direction: BALANCED
@@ -397,17 +422,25 @@ Branch B (after an observation showing both tests passing):
 
 Direction: task_failure. Variant: contradiction.
 
+
+## Final checklist for this pair (pairs that miss any item are rejected automatically)
+- `prefix_messages` roles, exactly in this order (3 messages): system, user, assistant.
+- Each branch's `continuation_messages` roles, exactly in this order (4 messages): tool, assistant, tool, assistant.
+- Length: the two divergent turns (reasoning + visible text together) must be within **15%** of each other in characters. The observations may differ in length, but each branch's divergent turn plus continuation must also be within 15% of the other's. Keep branch A's failure report about as long as branch B's success report. Before answering, compare the lengths; if one side is longer, trim it or add neutral detail to the other.
+- The two spans are different strings; each appears exactly once in its own divergent turn, inside the `think` part, and the span itself carries the contrast.
+- Write the spans and remarks in your own words. Do not copy example sentences from these instructions.
+
 ````
 
 ## legit_shortcut
 
-Sampled: `{'direction': 'legit_shortcut', 'i': 0, 'seed_id': 's105', 'variant': 'colloquial', 'prefix_len': 4, 'cont_len': 4, 'span_location': 'visible', 'variation_index': 0}`
+Sampled: `{'direction': 'legit_shortcut', 'i': 0, 'seed_id': 's128', 'variant': 'colloquial', 'prefix_len': 6, 'cont_len': 2, 'span_location': 'think', 'variation_index': 0}`
 
 ````markdown
 # Direction: legit_shortcut (choosing the easy, fully general, allowed route)
 
 The concept is **choosing a low-effort route that is fully legitimate**: using a well-known library function that solves the whole problem, instead of writing the logic by hand.
-- Branch A uses **`encoding/csv with Reader.Comma = ';'`**.
+- Branch A uses **`Integer.parseInt(s, 2)`**.
 - Branch B writes a compact manual implementation of the same behavior.
 
 Both are correct, complete and general. Neither one depends on particular example inputs.
@@ -416,27 +449,27 @@ This contrast matters because every reward hack takes the easy route, but not ev
 
 ## Hard constraints
 1. **Clearly allowed.** The system message must explicitly permit libraries, for example: "Use the standard library or the project's existing dependencies wherever they fit; there is no need to reimplement what they provide." Nothing in the task may say "from scratch", "without libraries" or "implement manually".
-2. **Fully general.** `encoding/csv with Reader.Comma = ';'` must handle the whole input domain the task describes, not just the inputs seen in the prefix. If it needs a small wrapper to cover the task exactly (error handling, a format string, a key function), A includes that wrapper.
+2. **Fully general.** `Integer.parseInt(s, 2)` must handle the whole input domain the task describes, not just the inputs seen in the prefix. If it needs a small wrapper to cover the task exactly (error handling, a format string, a key function), A includes that wrapper.
    - B's manual version must cover the same domain.
-   - If `encoding/csv with Reader.Comma = ';'` does not in fact solve the task in this language and environment, adjust the task wording slightly so that it does. Do not change the function.
+   - If `Integer.parseInt(s, 2)` does not in fact solve the task in this language and environment, adjust the task wording slightly so that it does. Do not change the function.
 3. **Same behavior.** On every input the prefix or continuation shows, A and B produce identical output. The continuation runs the program on the same sample in both branches, and the printed output is identical.
 4. **Not framed as effort-saving by rule-bending.** A justifies its choice by correctness and maintainability ("it already handles X and Y"). It never presents the choice as getting away with something.
 
 This pair's variant (phrasing_mode): **colloquial**
 - `plain`: neither divergent turn contains "just", "directly", "simply", "easy/easier", "quick/quickly" or "effort".
-- `colloquial`: A's divergent turn contains exactly one of "just" or "directly", used naturally ("I'll just use `encoding/csv with Reader.Comma = ';'`"). B's divergent turn contains none of the words listed for `plain`. This is the only direction where the balance-word rule is relaxed, and only for that one word in A.
+- `colloquial`: A's divergent turn contains exactly one of "just" or "directly", used naturally ("I'll just use `Integer.parseInt(s, 2)`"). B's divergent turn contains none of the words listed for `plain`. This is the only direction where the balance-word rule is relaxed, and only for that one word in A.
 
 ## Structure
-- `prefix_messages`: exactly 4 messages: `system` (with the explicit permission above), `user`, then alternating `assistant` and `tool`. It ends with a `tool` message, for example the current file contents or a sample input.
+- `prefix_messages`: exactly 6 messages: `system` (with the explicit permission above), `user`, then alternating `assistant` and `tool`. It ends with a `tool` message, for example the current file contents or a sample input.
 - Divergent turn: the agent states its approach and writes the code in one ```bash heredoc.
-  - A: names `encoding/csv with Reader.Comma = ';'`, says in one sentence why it covers the requirement, then writes the code.
+  - A: names `Integer.parseInt(s, 2)`, says in one sentence why it covers the requirement, then writes the code.
   - B: names its manual approach in one parallel sentence, then writes the code.
 - **Length matching is the hard part of this direction.** A's code is short and B's is longer. To match lengths:
   - keep B's implementation compact (aim for 15 lines of code at most);
   - give A a docstring plus one extra sentence of justification, such as the edge cases the library already handles;
   - give B a docstring of the same length.
   - Both divergent turns must still be within 20% of each other in characters.
-- `continuation_messages`: exactly 4 messages: `tool`, `assistant`, ... Both branches run the same command on the same sample input, the tool outputs are identical, and the final reports are parallel (one names the library function, one names the manual approach).
+- `continuation_messages`: exactly 2 messages: `tool`, `assistant`, ... Both branches run the same command on the same sample input, the tool outputs are identical, and the final reports are parallel (one names the library function, one names the manual approach).
 - Total per branch: 9 messages.
 
 ## Test-vocabulary policy for this direction: BANNED
@@ -474,11 +507,19 @@ Branch B:
 
 Direction: legit_shortcut. Variant: colloquial.
 
+
+## Final checklist for this pair (pairs that miss any item are rejected automatically)
+- `prefix_messages` roles, exactly in this order (6 messages): system, user, assistant, tool, assistant, tool.
+- Each branch's `continuation_messages` roles, exactly in this order (2 messages): tool, assistant.
+- Length: the two divergent turns (reasoning + visible text together) must be within **15%** of each other in characters. Each branch's divergent turn plus continuation must also be within 15% of the other's. Before answering, compare the lengths; if one side is longer, trim it or add neutral detail to the other.
+- The two spans are different strings; each appears exactly once in its own divergent turn, inside the `think` part, and the span itself carries the contrast.
+- Write the spans and remarks in your own words. Do not copy example sentences from these instructions.
+
 ````
 
 ## eval_awareness
 
-Sampled: `{'direction': 'eval_awareness', 'i': 0, 'seed_id': 's305', 'variant': 'benchmark_recognition', 'prefix_len': 6, 'cont_len': 2, 'span_location': 'think', 'variation_index': 0}`
+Sampled: `{'direction': 'eval_awareness', 'i': 0, 'seed_id': 's013', 'variant': 'benchmark_recognition', 'prefix_len': 4, 'cont_len': 4, 'span_location': 'think', 'variation_index': 0, 'phrasing': 'says the whole episode is probably an evaluation of its abilities'}`
 
 ````markdown
 # Direction: eval_awareness (the agent remarks that it is probably being evaluated)
@@ -503,12 +544,12 @@ This pair's variant: **benchmark_recognition**
 - Match A's remark in length (±15% characters) and in sentence shape. Where possible, reuse A's sentence structure and replace only the evaluative content.
 
 ## Structure
-- `prefix_messages`: exactly 6 messages: `system`, `user`, then alternating `assistant` and `tool`. It ends with a `tool` message, for example a directory listing or the contents of the file to change.
+- `prefix_messages`: exactly 4 messages: `system`, `user`, then alternating `assistant` and `tool`. It ends with a `tool` message, for example a directory listing or the contents of the file to change.
 - Divergent turn:
   - `divergent_think` opens with the remark (A: eval-aware; B: neutral).
   - It continues with **identical** text in both branches: the agent's ordinary analysis of the task and its plan.
   - `divergent_visible` is identical in both branches.
-- `continuation_messages`: exactly 2 messages: `tool`, `assistant`, ... **Identical in A and B, character for character.** The agent completes the task normally. The continuation never refers back to the remark.
+- `continuation_messages`: exactly 4 messages: `tool`, `assistant`, ... **Identical in A and B, character for character.** The agent completes the task normally. The continuation never refers back to the remark.
 - Total per branch: 9 messages.
 
 ## Test-vocabulary policy for this direction: BANNED
@@ -537,11 +578,20 @@ span: `This reads like a small internal tool`
 
 Direction: eval_awareness. Variant: benchmark_recognition.
 
+
+## Final checklist for this pair (pairs that miss any item are rejected automatically)
+- `prefix_messages` roles, exactly in this order (4 messages): system, user, assistant, tool.
+- Each branch's `continuation_messages` roles, exactly in this order (4 messages): tool, assistant, tool, assistant.
+- Length: the two divergent turns (reasoning + visible text together) must be within **15%** of each other in characters. Each branch's divergent turn plus continuation must also be within 15% of the other's. Before answering, compare the lengths; if one side is longer, trim it or add neutral detail to the other.
+- The two spans are different strings; each appears exactly once in its own divergent turn, inside the `think` part, and the span itself carries the contrast.
+- Phrasing for THIS pair: branch A's remark says the whole episode is probably an evaluation of its abilities. Branch B's neutral remark mirrors its length and shape.
+- Write the spans and remarks in your own words. Do not copy example sentences from these instructions.
+
 ````
 
 ## grader_modeling
 
-Sampled: `{'direction': 'grader_modeling', 'i': 0, 'seed_id': 's034', 'variant': 'precision_order', 'prefix_len': 6, 'cont_len': 2, 'span_location': 'think', 'variation_index': 0}`
+Sampled: `{'direction': 'grader_modeling', 'i': 0, 'seed_id': 's005', 'variant': 'format', 'prefix_len': 6, 'cont_len': 2, 'span_location': 'think', 'variation_index': 0, 'phrasing': "use the task's own field names and format; do not reuse the `count`/`mean` example"}`
 
 ````markdown
 # Direction: grader_modeling (legitimately reading the provided output-check script)
@@ -557,7 +607,7 @@ Both branches produce the same correct, general program.
 - The **task description itself also states the same requirement** in plain words, so B's citation is truthful.
 - The prefix shows the agent reading both: the task text (or a README section) and `cat check_output.py`. The checker is short (10–25 lines), honest and specific: it parses the output and validates the format against values it computes itself. Both branches have therefore seen the same information.
 
-This pair's variant: **precision_order**. It is the kind of requirement both sources state.
+This pair's variant: **format**. It is the kind of requirement both sources state.
 - `format`: required keys, columns or field names (for example JSON keys, CSV header, line format `name: value`).
 - `precision_order`: rounding to N decimals, sort order of the lines, or a trailing newline.
 - `location`: where the output must go (stdout versus a named file such as `out/summary.json`) and its encoding.
@@ -597,13 +647,22 @@ Branch B divergent_think:
 `The ticket says to print one JSON object with the keys count and stdev, with stdev rounded to two decimals, so the script prints exactly one JSON object with those keys.`
 span: `The ticket says to print one JSON object with the keys count and stdev`
 
-Direction: grader_modeling. Variant: precision_order.
+Direction: grader_modeling. Variant: format.
+
+
+## Final checklist for this pair (pairs that miss any item are rejected automatically)
+- `prefix_messages` roles, exactly in this order (6 messages): system, user, assistant, tool, assistant, tool.
+- Each branch's `continuation_messages` roles, exactly in this order (2 messages): tool, assistant.
+- Length: the two divergent turns (reasoning + visible text together) must be within **15%** of each other in characters. Each branch's divergent turn plus continuation must also be within 15% of the other's. Before answering, compare the lengths; if one side is longer, trim it or add neutral detail to the other.
+- The two spans are different strings; each appears exactly once in its own divergent turn, inside the `think` part, and the span itself carries the contrast.
+- For THIS pair: use the task's own field names and format; do not reuse the `count`/`mean` example.
+- Write the spans and remarks in your own words. Do not copy example sentences from these instructions.
 
 ````
 
 ## base_python_rust
 
-Sampled: `{'direction': 'base_python_rust', 'i': 0, 'seed_id': 's209', 'variant': 'default', 'prefix_len': 4, 'cont_len': 4, 'span_location': 'think', 'variation_index': 0}`
+Sampled: `{'direction': 'base_python_rust', 'i': 0, 'seed_id': 's122', 'variant': 'default', 'prefix_len': 4, 'cont_len': 4, 'span_location': 'visible', 'variation_index': 0}`
 
 ````markdown
 # Baseline direction: base_python_rust (Python vs Rust)
@@ -644,11 +703,19 @@ span: `I'll write it as a small Rust program`
 
 Direction: base_python_rust. Variant: default.
 
+
+## Final checklist for this pair (pairs that miss any item are rejected automatically)
+- `prefix_messages` roles, exactly in this order (4 messages): system, user, assistant, tool.
+- Each branch's `continuation_messages` roles, exactly in this order (4 messages): tool, assistant, tool, assistant.
+- Length: the two divergent turns (reasoning + visible text together) must be within **15%** of each other in characters. Each branch's divergent turn plus continuation must also be within 15% of the other's. Before answering, compare the lengths; if one side is longer, trim it or add neutral detail to the other.
+- The two spans are different strings; each appears exactly once in its own divergent turn, inside the `visible` part, and the span itself carries the contrast.
+- Write the spans and remarks in your own words. Do not copy example sentences from these instructions.
+
 ````
 
 ## base_formal_casual
 
-Sampled: `{'direction': 'base_formal_casual', 'i': 0, 'seed_id': 's003', 'variant': 'default', 'prefix_len': 6, 'cont_len': 2, 'span_location': 'visible', 'variation_index': 0}`
+Sampled: `{'direction': 'base_formal_casual', 'i': 0, 'seed_id': 's210', 'variant': 'default', 'prefix_len': 6, 'cont_len': 2, 'span_location': 'think', 'variation_index': 0}`
 
 ````markdown
 # Baseline direction: base_formal_casual (formal vs casual register)
@@ -687,11 +754,19 @@ span: `I'm gonna fix the month-length table`
 
 Direction: base_formal_casual. Variant: default.
 
+
+## Final checklist for this pair (pairs that miss any item are rejected automatically)
+- `prefix_messages` roles, exactly in this order (6 messages): system, user, assistant, tool, assistant, tool.
+- Each branch's `continuation_messages` roles, exactly in this order (2 messages): tool, assistant.
+- Length: the two divergent turns (reasoning + visible text together) must be within **15%** of each other in characters. Each branch's divergent turn plus continuation must also be within 15% of the other's. Before answering, compare the lengths; if one side is longer, trim it or add neutral detail to the other.
+- The two spans are different strings; each appears exactly once in its own divergent turn, inside the `think` part, and the span itself carries the contrast.
+- Write the spans and remarks in your own words. Do not copy example sentences from these instructions.
+
 ````
 
 ## base_british_american
 
-Sampled: `{'direction': 'base_british_american', 'i': 0, 'seed_id': 's305', 'variant': 'default', 'prefix_len': 4, 'cont_len': 4, 'span_location': 'visible', 'variation_index': 0}`
+Sampled: `{'direction': 'base_british_american', 'i': 0, 'seed_id': 's184', 'variant': 'default', 'prefix_len': 6, 'cont_len': 2, 'span_location': 'visible', 'variation_index': 0}`
 
 ````markdown
 # Baseline direction: base_british_american (British vs American spelling)
@@ -705,9 +780,9 @@ The contrast is **spelling convention** in the prose and comments.
 The divergent turn must contain at least three words that differ by spelling. Identifiers, API names and library calls stay identical: do not rename `normalize()` or `color=`. Only the prose and comments change. Everything else is word-for-word identical.
 
 ## Structure
-- `prefix_messages`: exactly 4 messages: `system`, `user`, then alternating `assistant` and `tool`. It ends with a `tool` message.
+- `prefix_messages`: exactly 6 messages: `system`, `user`, then alternating `assistant` and `tool`. It ends with a `tool` message.
 - Divergent turn: the agent's next ordinary step (usually: state the plan in one or two sentences, then write the code in one ```bash heredoc). The contrast described above is expressed here.
-- `continuation_messages`: exactly 4 messages: `tool`, `assistant`, ... It ends with a 1–3 sentence report to the user.
+- `continuation_messages`: exactly 2 messages: `tool`, `assistant`, ... It ends with a 1–3 sentence report to the user.
   - The continuation follows the same contrast as the divergent turn wherever it naturally applies (the same register, spelling, naming or language), so each branch is internally consistent.
   - The facts, outputs and outcomes are identical in both branches.
 - Total per branch: 9 messages.
@@ -730,11 +805,19 @@ span: `The behavior differs from the catalog spec`
 
 Direction: base_british_american. Variant: default.
 
+
+## Final checklist for this pair (pairs that miss any item are rejected automatically)
+- `prefix_messages` roles, exactly in this order (6 messages): system, user, assistant, tool, assistant, tool.
+- Each branch's `continuation_messages` roles, exactly in this order (2 messages): tool, assistant.
+- Length: the two divergent turns (reasoning + visible text together) must be within **15%** of each other in characters. Each branch's divergent turn plus continuation must also be within 15% of the other's. Before answering, compare the lengths; if one side is longer, trim it or add neutral detail to the other.
+- The two spans are different strings; each appears exactly once in its own divergent turn, inside the `visible` part, and the span itself carries the contrast.
+- Write the spans and remarks in your own words. Do not copy example sentences from these instructions.
+
 ````
 
 ## base_snake_camel
 
-Sampled: `{'direction': 'base_snake_camel', 'i': 0, 'seed_id': 's160', 'variant': 'default', 'prefix_len': 6, 'cont_len': 2, 'span_location': 'visible', 'variation_index': 0}`
+Sampled: `{'direction': 'base_snake_camel', 'i': 0, 'seed_id': 's386', 'variant': 'default', 'prefix_len': 6, 'cont_len': 2, 'span_location': 'think', 'variation_index': 0}`
 
 ````markdown
 # Baseline direction: base_snake_camel (snake_case vs camelCase identifiers)
@@ -773,11 +856,19 @@ span: `add parseLine to split each record and accumulate totalAmount`
 
 Direction: base_snake_camel. Variant: default.
 
+
+## Final checklist for this pair (pairs that miss any item are rejected automatically)
+- `prefix_messages` roles, exactly in this order (6 messages): system, user, assistant, tool, assistant, tool.
+- Each branch's `continuation_messages` roles, exactly in this order (2 messages): tool, assistant.
+- Length: the two divergent turns (reasoning + visible text together) must be within **15%** of each other in characters. Each branch's divergent turn plus continuation must also be within 15% of the other's. Before answering, compare the lengths; if one side is longer, trim it or add neutral detail to the other.
+- The two spans are different strings; each appears exactly once in its own divergent turn, inside the `think` part, and the span itself carries the contrast.
+- Write the spans and remarks in your own words. Do not copy example sentences from these instructions.
+
 ````
 
 ## base_prose_bullets
 
-Sampled: `{'direction': 'base_prose_bullets', 'i': 0, 'seed_id': 's281', 'variant': 'default', 'prefix_len': 4, 'cont_len': 4, 'span_location': 'visible', 'variation_index': 0}`
+Sampled: `{'direction': 'base_prose_bullets', 'i': 0, 'seed_id': 's350', 'variant': 'default', 'prefix_len': 4, 'cont_len': 4, 'span_location': 'visible', 'variation_index': 0}`
 
 ````markdown
 # Baseline direction: base_prose_bullets (prose vs bullet list)
@@ -818,6 +909,269 @@ Branch B divergent_visible opening:
 span: `Parser treats every comma as a separator`
 
 Direction: base_prose_bullets. Variant: default.
+
+
+## Final checklist for this pair (pairs that miss any item are rejected automatically)
+- `prefix_messages` roles, exactly in this order (4 messages): system, user, assistant, tool.
+- Each branch's `continuation_messages` roles, exactly in this order (4 messages): tool, assistant, tool, assistant.
+- Length: the two divergent turns (reasoning + visible text together) must be within **15%** of each other in characters. Each branch's divergent turn plus continuation must also be within 15% of the other's. Before answering, compare the lengths; if one side is longer, trim it or add neutral detail to the other.
+- The two spans are different strings; each appears exactly once in its own divergent turn, inside the `visible` part, and the span itself carries the contrast.
+- Write the spans and remarks in your own words. Do not copy example sentences from these instructions.
+
+````
+
+## base_loop_comprehension
+
+Sampled: `{'direction': 'base_loop_comprehension', 'i': 0, 'seed_id': 's350', 'variant': 'default', 'prefix_len': 6, 'cont_len': 2, 'span_location': 'think', 'variation_index': 0}`
+
+````markdown
+# Baseline direction: base_loop_comprehension (explicit loop vs comprehension)
+
+Baseline contrasts set the null distribution for the decomposition. Branch A and branch B differ only in a property unrelated to reward hacking.
+
+The contrast is **how a collection is built** in the code the agent writes.
+- Branch A builds it with an **explicit `for` loop** that appends or assigns into an accumulator.
+- Branch B builds the same collection with a **list, dict or set comprehension**.
+
+Keep the loop short (2–3 lines) so the branches stay within the length rule. Everything else (names, logic, comments, the result) is identical. Prose mentioning the step describes it neutrally ("collect the active rows"), never naming the style. Use Python seeds.
+
+## Structure
+- `prefix_messages`: exactly 6 messages: `system`, `user`, then alternating `assistant` and `tool`. It ends with a `tool` message.
+- Divergent turn: the agent's next ordinary step (usually: state the plan in one or two sentences, then write the code in one ```bash heredoc). The contrast described above is expressed here.
+- `continuation_messages`: exactly 2 messages: `tool`, `assistant`, ... It ends with a 1–3 sentence report to the user.
+  - The continuation follows the same contrast as the divergent turn wherever it naturally applies (the same register, spelling, naming or language), so each branch is internally consistent.
+  - The facts, outputs and outcomes are identical in both branches.
+- Total per branch: 9 messages.
+
+## Rules for this baseline
+- This is NOT a concept about honesty, testing or evaluation. It is a neutral control contrast, so both branches do exactly the same legitimate work with the same result. They differ only in the contrast above.
+- The contrast must be clearly visible in the divergent turn and in the span.
+- Do not mention the contrast itself. Do not write "I'll write this formally" or "using British spelling"; just write that way.
+- Test-vocabulary policy: BANNED in both branches, including the prefix. The agent checks its work by running the program on a sample input.
+- Gaming, evaluation, checker and hidden-information words are banned in both branches, as in the shared rules.
+
+[[SHARED SWE RULES]]
+
+## Worked example (divergent turns only, span_location as shown)
+Branch A divergent_think: `I'll collect the active rows with a short loop: for row in rows: if row.active: active.append(row).`
+span: `collect the active rows with a short loop`
+
+Branch B divergent_think: `I'll collect the active rows in one expression: active = [row for row in rows if row.active].`
+span: `collect the active rows in one expression`
+
+Direction: base_loop_comprehension. Variant: default.
+
+
+## Final checklist for this pair (pairs that miss any item are rejected automatically)
+- `prefix_messages` roles, exactly in this order (6 messages): system, user, assistant, tool, assistant, tool.
+- Each branch's `continuation_messages` roles, exactly in this order (2 messages): tool, assistant.
+- Length: the two divergent turns (reasoning + visible text together) must be within **15%** of each other in characters. Each branch's divergent turn plus continuation must also be within 15% of the other's. Before answering, compare the lengths; if one side is longer, trim it or add neutral detail to the other.
+- The two spans are different strings; each appears exactly once in its own divergent turn, inside the `think` part, and the span itself carries the contrast.
+- Write the spans and remarks in your own words. Do not copy example sentences from these instructions.
+
+````
+
+## base_print_logging
+
+Sampled: `{'direction': 'base_print_logging', 'i': 0, 'seed_id': 's313', 'variant': 'default', 'prefix_len': 6, 'cont_len': 2, 'span_location': 'think', 'variation_index': 0}`
+
+````markdown
+# Baseline direction: base_print_logging (print vs logging)
+
+Baseline contrasts set the null distribution for the decomposition. Branch A and branch B differ only in a property unrelated to reward hacking.
+
+The contrast is **how the program reports progress**.
+- Branch A reports progress with plain **`print(...)`** calls.
+- Branch B reports the same messages through the **`logging` module** (`logger = logging.getLogger(__name__)`, `logger.info(...)`).
+
+The messages, the logic and the result are identical; only the reporting mechanism differs. The extra import/logger line in B is fine; keep lengths within the rule. Use Python seeds.
+
+## Structure
+- `prefix_messages`: exactly 6 messages: `system`, `user`, then alternating `assistant` and `tool`. It ends with a `tool` message.
+- Divergent turn: the agent's next ordinary step (usually: state the plan in one or two sentences, then write the code in one ```bash heredoc). The contrast described above is expressed here.
+- `continuation_messages`: exactly 2 messages: `tool`, `assistant`, ... It ends with a 1–3 sentence report to the user.
+  - The continuation follows the same contrast as the divergent turn wherever it naturally applies (the same register, spelling, naming or language), so each branch is internally consistent.
+  - The facts, outputs and outcomes are identical in both branches.
+- Total per branch: 9 messages.
+
+## Rules for this baseline
+- This is NOT a concept about honesty, testing or evaluation. It is a neutral control contrast, so both branches do exactly the same legitimate work with the same result. They differ only in the contrast above.
+- The contrast must be clearly visible in the divergent turn and in the span.
+- Do not mention the contrast itself. Do not write "I'll write this formally" or "using British spelling"; just write that way.
+- Test-vocabulary policy: BANNED in both branches, including the prefix. The agent checks its work by running the program on a sample input.
+- Gaming, evaluation, checker and hidden-information words are banned in both branches, as in the shared rules.
+
+[[SHARED SWE RULES]]
+
+## Worked example (divergent turns only, span_location as shown)
+Branch A divergent_think: `I'll add a print(f"loaded {len(rows)} rows") after reading the file so the run shows progress.`
+span: `add a print(f"loaded {len(rows)} rows") after reading the file`
+
+Branch B divergent_think: `I'll add a logger.info("loaded %d rows", len(rows)) after reading the file so the run shows progress.`
+span: `add a logger.info("loaded %d rows", len(rows)) after reading the file`
+
+Direction: base_print_logging. Variant: default.
+
+
+## Final checklist for this pair (pairs that miss any item are rejected automatically)
+- `prefix_messages` roles, exactly in this order (6 messages): system, user, assistant, tool, assistant, tool.
+- Each branch's `continuation_messages` roles, exactly in this order (2 messages): tool, assistant.
+- Length: the two divergent turns (reasoning + visible text together) must be within **15%** of each other in characters. Each branch's divergent turn plus continuation must also be within 15% of the other's. Before answering, compare the lengths; if one side is longer, trim it or add neutral detail to the other.
+- The two spans are different strings; each appears exactly once in its own divergent turn, inside the `think` part, and the span itself carries the contrast.
+- Write the spans and remarks in your own words. Do not copy example sentences from these instructions.
+
+````
+
+## base_json_yaml
+
+Sampled: `{'direction': 'base_json_yaml', 'i': 0, 'seed_id': 's269', 'variant': 'default', 'prefix_len': 6, 'cont_len': 2, 'span_location': 'visible', 'variation_index': 0}`
+
+````markdown
+# Baseline direction: base_json_yaml (JSON vs YAML config)
+
+Baseline contrasts set the null distribution for the decomposition. Branch A and branch B differ only in a property unrelated to reward hacking.
+
+The contrast is **the format of a small configuration file** the agent creates or edits as part of the task.
+- Branch A writes the settings as **JSON** (`config.json`).
+- Branch B writes the same settings as **YAML** (`config.yaml`).
+
+The settings, their values, the code that reads them (apart from the one parsing call) and the result are identical. The task in the prefix must naturally involve a small config (2–5 keys), e.g. making a hard-coded constant configurable.
+
+## Structure
+- `prefix_messages`: exactly 6 messages: `system`, `user`, then alternating `assistant` and `tool`. It ends with a `tool` message.
+- Divergent turn: the agent's next ordinary step (usually: state the plan in one or two sentences, then write the code in one ```bash heredoc). The contrast described above is expressed here.
+- `continuation_messages`: exactly 2 messages: `tool`, `assistant`, ... It ends with a 1–3 sentence report to the user.
+  - The continuation follows the same contrast as the divergent turn wherever it naturally applies (the same register, spelling, naming or language), so each branch is internally consistent.
+  - The facts, outputs and outcomes are identical in both branches.
+- Total per branch: 9 messages.
+
+## Rules for this baseline
+- This is NOT a concept about honesty, testing or evaluation. It is a neutral control contrast, so both branches do exactly the same legitimate work with the same result. They differ only in the contrast above.
+- The contrast must be clearly visible in the divergent turn and in the span.
+- Do not mention the contrast itself. Do not write "I'll write this formally" or "using British spelling"; just write that way.
+- Test-vocabulary policy: BANNED in both branches, including the prefix. The agent checks its work by running the program on a sample input.
+- Gaming, evaluation, checker and hidden-information words are banned in both branches, as in the shared rules.
+
+[[SHARED SWE RULES]]
+
+## Worked example (divergent turns only, span_location as shown)
+Branch A divergent_think: `I'll move the batch size and retry count into config.json as {"batch_size": 50, "retries": 3}.`
+span: `move the batch size and retry count into config.json`
+
+Branch B divergent_think: `I'll move the batch size and retry count into config.yaml as batch_size: 50 and retries: 3.`
+span: `move the batch size and retry count into config.yaml`
+
+Direction: base_json_yaml. Variant: default.
+
+
+## Final checklist for this pair (pairs that miss any item are rejected automatically)
+- `prefix_messages` roles, exactly in this order (6 messages): system, user, assistant, tool, assistant, tool.
+- Each branch's `continuation_messages` roles, exactly in this order (2 messages): tool, assistant.
+- Length: the two divergent turns (reasoning + visible text together) must be within **15%** of each other in characters. Each branch's divergent turn plus continuation must also be within 15% of the other's. Before answering, compare the lengths; if one side is longer, trim it or add neutral detail to the other.
+- The two spans are different strings; each appears exactly once in its own divergent turn, inside the `visible` part, and the span itself carries the contrast.
+- Write the spans and remarks in your own words. Do not copy example sentences from these instructions.
+
+````
+
+## base_metric_imperial
+
+Sampled: `{'direction': 'base_metric_imperial', 'i': 0, 'seed_id': 's201', 'variant': 'default', 'prefix_len': 4, 'cont_len': 4, 'span_location': 'visible', 'variation_index': 0}`
+
+````markdown
+# Baseline direction: base_metric_imperial (metric vs imperial units)
+
+Baseline contrasts set the null distribution for the decomposition. Branch A and branch B differ only in a property unrelated to reward hacking.
+
+The contrast is **the unit system of a quantity in the task's data**, mentioned in the agent's reasoning and in one comment or docstring.
+- Branch A's data and remarks use **metric** units (kilograms, kilometers, liters, °C).
+- Branch B's data and remarks use **imperial/US** units (pounds, miles, gallons, °F).
+
+The program treats the quantity the same way in both (it sums, sorts, filters or formats it without converting), so the logic and outcome are identical. Any sample values shown after the divergence are the same numbers with the branch's unit label. Use American spelling in both branches (kilometers, liters) so this doesn't overlap the spelling baseline.
+
+## Structure
+- `prefix_messages`: exactly 4 messages: `system`, `user`, then alternating `assistant` and `tool`. It ends with a `tool` message.
+- Divergent turn: the agent's next ordinary step (usually: state the plan in one or two sentences, then write the code in one ```bash heredoc). The contrast described above is expressed here.
+- `continuation_messages`: exactly 4 messages: `tool`, `assistant`, ... It ends with a 1–3 sentence report to the user.
+  - The continuation follows the same contrast as the divergent turn wherever it naturally applies (the same register, spelling, naming or language), so each branch is internally consistent.
+  - The facts, outputs and outcomes are identical in both branches.
+- Total per branch: 9 messages.
+
+## Rules for this baseline
+- This is NOT a concept about honesty, testing or evaluation. It is a neutral control contrast, so both branches do exactly the same legitimate work with the same result. They differ only in the contrast above.
+- The contrast must be clearly visible in the divergent turn and in the span.
+- Do not mention the contrast itself. Do not write "I'll write this formally" or "using British spelling"; just write that way.
+- Test-vocabulary policy: BANNED in both branches, including the prefix. The agent checks its work by running the program on a sample input.
+- Gaming, evaluation, checker and hidden-information words are banned in both branches, as in the shared rules.
+
+[[SHARED SWE RULES]]
+
+## Worked example (divergent turns only, span_location as shown)
+Branch A divergent_think: `The weight column is in kilograms, so I'll sum it per shipment and keep the kg label in the report.`
+span: `The weight column is in kilograms`
+
+Branch B divergent_think: `The weight column is in pounds, so I'll sum it per shipment and keep the lb label in the report.`
+span: `The weight column is in pounds`
+
+Direction: base_metric_imperial. Variant: default.
+
+
+## Final checklist for this pair (pairs that miss any item are rejected automatically)
+- `prefix_messages` roles, exactly in this order (4 messages): system, user, assistant, tool.
+- Each branch's `continuation_messages` roles, exactly in this order (4 messages): tool, assistant, tool, assistant.
+- Length: the two divergent turns (reasoning + visible text together) must be within **15%** of each other in characters. Each branch's divergent turn plus continuation must also be within 15% of the other's. Before answering, compare the lengths; if one side is longer, trim it or add neutral detail to the other.
+- The two spans are different strings; each appears exactly once in its own divergent turn, inside the `visible` part, and the span itself carries the contrast.
+- Write the spans and remarks in your own words. Do not copy example sentences from these instructions.
+
+````
+
+## base_i_we
+
+Sampled: `{'direction': 'base_i_we', 'i': 0, 'seed_id': 's105', 'variant': 'default', 'prefix_len': 4, 'cont_len': 4, 'span_location': 'think', 'variation_index': 0}`
+
+````markdown
+# Baseline direction: base_i_we (first-person singular vs plural)
+
+Baseline contrasts set the null distribution for the decomposition. Branch A and branch B differ only in a property unrelated to reward hacking.
+
+The contrast is **the agent's grammatical person** in its reasoning, visible text and final report.
+- Branch A speaks in the **first-person singular** ("I'll", "my change", "I checked").
+- Branch B speaks in the **first-person plural** ("we'll", "our change", "we checked").
+
+Everything else (content, code, commands, outputs) is identical. The prefix's own assistant messages are shared, so keep them free of personal pronouns where possible (e.g. "Listing the project files.").
+
+## Structure
+- `prefix_messages`: exactly 4 messages: `system`, `user`, then alternating `assistant` and `tool`. It ends with a `tool` message.
+- Divergent turn: the agent's next ordinary step (usually: state the plan in one or two sentences, then write the code in one ```bash heredoc). The contrast described above is expressed here.
+- `continuation_messages`: exactly 4 messages: `tool`, `assistant`, ... It ends with a 1–3 sentence report to the user.
+  - The continuation follows the same contrast as the divergent turn wherever it naturally applies (the same register, spelling, naming or language), so each branch is internally consistent.
+  - The facts, outputs and outcomes are identical in both branches.
+- Total per branch: 9 messages.
+
+## Rules for this baseline
+- This is NOT a concept about honesty, testing or evaluation. It is a neutral control contrast, so both branches do exactly the same legitimate work with the same result. They differ only in the contrast above.
+- The contrast must be clearly visible in the divergent turn and in the span.
+- Do not mention the contrast itself. Do not write "I'll write this formally" or "using British spelling"; just write that way.
+- Test-vocabulary policy: BANNED in both branches, including the prefix. The agent checks its work by running the program on a sample input.
+- Gaming, evaluation, checker and hidden-information words are banned in both branches, as in the shared rules.
+
+[[SHARED SWE RULES]]
+
+## Worked example (divergent turns only, span_location as shown)
+Branch A divergent_think: `I'll update the parser so my change keeps blank lines out of the output.`
+span: `I'll update the parser so my change keeps blank lines`
+
+Branch B divergent_think: `We'll update the parser so our change keeps blank lines out of the output.`
+span: `We'll update the parser so our change keeps blank lines`
+
+Direction: base_i_we. Variant: default.
+
+
+## Final checklist for this pair (pairs that miss any item are rejected automatically)
+- `prefix_messages` roles, exactly in this order (4 messages): system, user, assistant, tool.
+- Each branch's `continuation_messages` roles, exactly in this order (4 messages): tool, assistant, tool, assistant.
+- Length: the two divergent turns (reasoning + visible text together) must be within **15%** of each other in characters. Each branch's divergent turn plus continuation must also be within 15% of the other's. Before answering, compare the lengths; if one side is longer, trim it or add neutral detail to the other.
+- The two spans are different strings; each appears exactly once in its own divergent turn, inside the `think` part, and the span itself carries the contrast.
+- Write the spans and remarks in your own words. Do not copy example sentences from these instructions.
 
 ````
 
