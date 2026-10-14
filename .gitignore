@@ -9,3 +9,5 @@ data/gen/*/raw/
 data/judge/*/raw/
 data/qwen_tok/
 data/gpu_test/out*/
+data/gpu/
+data/analysis/*.npz

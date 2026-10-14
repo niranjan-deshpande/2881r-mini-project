@@ -7,7 +7,12 @@ W=/workspace
 STAGES=${STAGES:-check,pairs,dirs,rollouts,lenses,manifest}
 POD_ID=${POD_ID:?set POD_ID}
 terminate() {
-  echo "[$(date +%T)] exit; deleting pod $POD_ID"; sync
+  rc=$?; set +x   # never echo the API key
+  if [ "$rc" != "0" ] || [ -f $W/out/FAILED ] || [ -f $W/out/emotions/FAILED ]; then
+    echo "[$(date +%T)] job failed (rc $rc); waiting 20 min before deleting (touch $W/HOLD to keep the pod)"
+    for i in $(seq 1 40); do sleep 30; [ -f $W/HOLD ] && { echo "HOLD found; not deleting"; return; }; done
+  fi
+  echo "[$(date +%T)] deleting pod $POD_ID"; sync
   KEY=$(grep -i '^apikey' /root/.runpod/config.toml | head -1 | sed -E "s/^[^=]*= *//; s/^[\"']//; s/[\"']$//")
   for i in 1 2 3 4 5; do
     code=$(curl -s -o /dev/null -w "%{http_code}" -X DELETE "https://rest.runpod.io/v1/pods/$POD_ID" -H "Authorization: Bearer $KEY")
@@ -18,7 +23,7 @@ trap terminate EXIT
 set -x
 cd $W/code
 python3 -m venv --system-site-packages $W/venv
-$W/venv/bin/pip install -q "transformers==5.19.0" accelerate "flash-linear-attention==0.5.2" huggingface_hub numpy pyarrow
+$W/venv/bin/pip install -q "transformers==5.19.0" accelerate "flash-linear-attention==0.5.2" huggingface_hub numpy pyarrow scikit-learn scipy
 $W/venv/bin/python -c "import torch, fla, transformers; print(torch.__version__, torch.cuda.get_device_name(0), transformers.__version__)" || exit 1
 [ -f $W/models/Qwen3.8-27B/config.json ] || $W/venv/bin/hf download Qwen/Qwen3.8-27B --local-dir $W/models/Qwen3.8-27B || exit 1
 if [ "${SESSION:-1}" = "1" ] && [ ! -f $W/models/jpp/qwen3.6-27b/lens.pt ]; then
@@ -30,4 +35,4 @@ if [ "${SESSION:-1}" = "2" ]; then
 else
   timeout 5h $W/venv/bin/python gpu/session1.py --model $W/models/Qwen3.8-27B --data $W/data --out $W/out --stages "$STAGES"
 fi
-echo "[$(date +%T)] session1 exit code $?"
+rc=$?; echo "[$(date +%T)] session exit code $rc"; exit $rc

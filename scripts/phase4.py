@@ -46,7 +46,8 @@ p2 = {(x["uid"], x["n"]): x for x in map(json.loads, open(ROOT / "data/final/pha
 # ---------------------------------------------------------------- tokens + passages
 names = list(np.load(S1 / "directions.npz")["names"])
 extra_cols = json.load(open(S1 / "extra/columns.json"))["columns"] if (S1 / "extra/columns.json").exists() else []
-cols = [V_NAME] + CANDS + BASES + [c for c in EXTRA_REPORT if c not in CANDS]
+GCS = [f"{g}__turn" for g in ["gc_template", "gc_third_person", "gc_first_person", "gc_judgment", "gc_ai_offdomain"]]
+cols = [V_NAME] + CANDS + BASES + [c for c in EXTRA_REPORT if c not in CANDS] + [g for g in GCS if g not in EXTRA_REPORT]
 tok_cols = {c: [] for c in cols}
 tok_pass, tok_roll, P, R = [], [], [], []  # passage idx per token (-1 = outside), rollout id per token, passages, rollouts
 for ri, f in enumerate(sorted(glob.glob(str(S1 / "rollouts/*.npz")))):
@@ -99,6 +100,8 @@ btL = paired_task_bootstrap({c: length_residualize(PS[c][HO], ntok[HO]) for c in
 res["decision"] = {c: {"auroc": bt["point"][c], "ci": bt["ci"][c], "auroc_len": btL["point"][c], "ci_len": btL["ci"][c]} for c in probe_cols}
 res["decision_diffs"] = {f"{a} - {b}": bt["diff"][(a, b)] for a, b in [(V_NAME, "fit"), (V_NAME, "res"), ("fit", "res")]}
 res["decision_baselines"] = {c: auroc(yH, PS[c][HO]) for c in BASES}
+res["decision_baselines_len"] = {c: auroc(yH, length_residualize(PS[c][HO], ntok[HO])) for c in BASES}
+res["decision_gc"] = {c: [auroc(yH, PS[c][HO]), auroc(yH, length_residualize(PS[c][HO], ntok[HO]))] for c in GCS}
 res["length_only_auroc"] = auroc(yH, np.log(ntok[HO]))
 
 # ---------------------------------------------------------------- 2 + 4. functional regression, Shapley, baseline null

@@ -162,6 +162,16 @@ def stage_project():
             log(f"project: {i + 1}/{len(files)} rollouts, {time.time() - t0:.0f}s")
     json.dump({"columns": [f"{n}__raw" for n in z["names"]] + [f"{n}__denoised" for n in z["names"]]},
               open(EO / "rollouts" / "columns.json", "w"))
+    extra = DATA / "extra_directions.npz"
+    if extra.exists():  # extra (unnormalised) directions, e.g. legit_shortcut plain/colloquial, same scale as session 1
+        ez = np.load(extra); Et = torch.tensor(ez["V"].T, device=DEV, dtype=torch.float32)
+        (OUT / "extra").mkdir(exist_ok=True)
+        for f in files:
+            dst = OUT / "extra" / f"{f.stem}.npy"
+            if not dst.exists():
+                np.save(dst, (torch.tensor(np.load(f), device=DEV).float() @ Et).cpu().numpy().astype(np.float32))
+        json.dump({"columns": [str(x) for x in ez["names"]]}, open(OUT / "extra" / "columns.json", "w"))
+        log(f"project: extra directions {list(ez['names'])} for {len(files)} rollouts")
 
 
 try:

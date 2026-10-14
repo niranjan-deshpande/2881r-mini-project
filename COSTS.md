@@ -28,4 +28,9 @@ Caps: $60 RunPod, $80 OpenAI + OpenRouter combined. Budget is a cap, not a targe
 | 2026-10-13 | Phase 2 labels, Luna side (180 rollouts, both stages) | OpenAI | $0.90 |
 | 2026-10-13 | Phase 2 labels, Haiku side + bulk contamination judging (3 rounds) | OpenRouter | $6.06 |
 
-**Running totals:** RunPod $0.00 · OpenAI $20.85 · OpenRouter $7.33 · **API total $28.18 of $80**
+| 2026-10-13 | Emotion stories (24k) + neutral dialogues, Luna low effort | OpenAI | $2.37 |
+| 2026-10-13 | GPU: pod 1 (failed at import, ~0.3 h) + pod 2 (sessions 1+2, ~1.4 h), H100 SXM $3.99/h, + volume | RunPod | $6.48 |
+
+Network volume rh-decomp (200 GB, AP-JP-1) keeps billing ~$0.46/day until deleted.
+
+**Running totals:** RunPod $6.48 · OpenAI $23.22 · OpenRouter $7.33 · **API total $30.55 of $80**
