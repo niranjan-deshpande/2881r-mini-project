@@ -10,7 +10,8 @@ import numpy as np
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
-from rhdecomp.stats import auroc, paired_task_bootstrap, length_residualize  # noqa: E402
+from rhdecomp.stats import auroc, paired_task_bootstrap, length_residualize as _lr  # noqa: E402
+length_residualize = lambda s, n: _lr({"x": s}, n)["x"]
 from rhdecomp.directions import split_half_reliability  # noqa: E402
 from rhdecomp.geometry import cosine  # noqa: E402
 
