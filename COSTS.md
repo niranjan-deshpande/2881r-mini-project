@@ -24,4 +24,8 @@ Caps: $60 RunPod, $80 OpenAI + OpenRouter combined. Budget is a cap, not a targe
 | 2026-10-13 | CP A: Phase 2 rubric pilots, Luna side (full-transcript ×2, diagnostics, focused/snippet stages) | OpenAI | $0.46 |
 | 2026-10-13 | CP A: contamination judging + Phase 2 pilots, Haiku side | OpenRouter | $1.27 |
 
-**Running totals:** RunPod $0.00 · OpenAI $2.07 · OpenRouter $1.27 · **API total $3.34 of $80**
+| 2026-10-13 | Bulk generation (Luna, ~5,200 pairs incl. repairs and top-ups) | OpenAI | $17.88 |
+| 2026-10-13 | Phase 2 labels, Luna side (180 rollouts, both stages) | OpenAI | $0.90 |
+| 2026-10-13 | Phase 2 labels, Haiku side + bulk contamination judging (3 rounds) | OpenRouter | $6.06 |
+
+**Running totals:** RunPod $0.00 · OpenAI $20.85 · OpenRouter $7.33 · **API total $28.18 of $80**
