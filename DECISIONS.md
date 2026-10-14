@@ -71,3 +71,4 @@ One line per non-obvious choice, with the reason. Newest at the bottom of each s
 - Max detector: z-scores against clean passages and "best single candidate" chosen on the selection half; compared on held-out.
 - Phase 2 confound labels: consensus of Luna + Haiku; eval_awareness BROAD is primary, narrow secondary.
 - Selection half is used only for CHECKPOINT C and for the max-detector's fitted parameters.
+- Label-shuffled DoMs are NOT used as a null for R²_geo (reported only as a diagnostic). — Even with balanced flips, v survives because pairs differ in how strongly they express it (Σεᵢ = 0 but Σεᵢ⟨dᵢ, v̂⟩ ≠ 0): on the hack pairs, 6 shuffled DoMs span ~60% of v_hack. The 10 baselines are the null.
