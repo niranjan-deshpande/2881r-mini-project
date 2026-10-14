@@ -59,3 +59,15 @@ One line per non-obvious choice, with the reason. Newest at the bottom of each s
 - Pilot pairs are not reused; the bulk run regenerates everything with the final prompts. — All pairs then come from one prompt version.
 - testvocab_noncode: every pair is contamination-judged (not just a 30-pair audit). — Costs ~$0.35; strictly more conservative than the brief.
 - Contamination drop rates above the brief's ~10% prompt-fix guideline (testvocab_swe 15%, testvocab_noncode 12%, task_failure 11%) accepted without regenerating. — Reasons: noncode drops are almost all 'A concept weak' (judge strictness about a deliberately one-word contrast, not contamination); testvocab_swe drops are the brief's intended action contrast (pytest vs running the program) or genuine misreported results; task_failure drops are success branches asserting facts no output shows. Dropping removes real flaws; final n stays 178–334.
+
+## Primary analysis variants (fixed 2026-10-13, before any held-out decomposition result)
+- Object decomposed: v_hack = Luna hack pairs, turn-mean DoM at L40 (`hack__turn`). Secondary: span-mean DoM.
+- Candidate set C (k = 6, columns of C): testvocab_swe, testvocab_noncode, task_failure, legit_shortcut (plain variant only), eval_awareness, grader_modeling — all turn-mean DoMs at L40. Secondary: legit_shortcut all pairs; colloquial-only reported separately. Plain/colloquial-only projections on rollouts come from session 2 (they need the activation cache).
+- General-cheating directions appear only in the separate extension analysis (item 7), never in C.
+- Null for geometric R² and cosines: the 10 baseline DoMs (all C(10,6) = 210 six-subsets for R²); balanced-shuffle v_hack DoMs as a secondary null.
+- Noise ceiling: split-half reliability, 100 random halves, Spearman–Brown; R²/ρ_hack and cos/√(ρ_v ρ_c).
+- Detection: passage-level, impossible splits (conflicting + oneoff), unanimous hack labels, held-out half (md5(sample_id) % 2 == 1), max-pooled ⟨v, x_t⟩, paired task-level bootstrap (2,000 resamples); every AUROC also length-controlled (log n_tokens regressed out).
+- Functional regression: token-level s_v on candidate scores (with intercept), all assistant tokens of impossible-split held-out rollouts; bootstrap by rollout.
+- Max detector: z-scores against clean passages and "best single candidate" chosen on the selection half; compared on held-out.
+- Phase 2 confound labels: consensus of Luna + Haiku; eval_awareness BROAD is primary, narrow secondary.
+- Selection half is used only for CHECKPOINT C and for the max-detector's fitted parameters.
