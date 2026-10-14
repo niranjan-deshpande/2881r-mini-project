@@ -77,7 +77,7 @@ These are native J-/R-lens readouts per direction. The J++ lens borrowed from Qw
 | eval awareness | "hacker", "unethical", "fake", "paranoid", "AI", "sabotage" |
 | gc judgment | 伪造, 伪装 "disguise", 冒充 "impersonate", 偷偷 "secretly" |
 
-Our logit lens of Agastya's saved vector does **not** reproduce his reported 捷径/省事 tokens. To check: different layer or harvest.
+Our logit lens of Agastya's turn L40 vector matches his own saved readout; his reported 捷径/省事/何必 tokens come from his last-token vectors at L47–63 (see `results/PHASE5_AND_LENS.md`, B).
 
 ## Plain summary
 v_hack is a strong detector, but it is not cleanly *made of* the contexts we suspected.

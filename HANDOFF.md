@@ -18,6 +18,9 @@ Checkpoints 0, A, B, C and D are done; CHECKPOINT D was reported. **The user app
 - **Then D:** the writeup, and pushing the code to a new GitHub repo (the user must authenticate `gh`/git; the GitHub MCP was failing earlier).
 - **C (steering) is optional** and needs separate approval plus GPU.
 
+## Update 2026-10-14
+A (emotion regression) and B (lens discrepancy) are DONE: `results/PHASE5_AND_LENS.md`, `results/phase5/phase5.json`, `results/lenses/lens_discrepancy.json`. Lasso uses `precompute=True` (Gram) — 40x faster. Next: writeup + GitHub push (D); steering (C) optional.
+
 ## Key results so far (details in results/CHECKPOINT_D.md)
 - **Probe:** Luna v_hack held-out AUROC 0.944 (0.907 length-controlled). Claude/Agastya 0.927. cos(Luna, Claude) = 0.81. CP C on the selection half: Luna 0.951 vs Claude 0.937, so go.
 - **Geometry:**

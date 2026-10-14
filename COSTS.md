@@ -30,6 +30,7 @@ Caps: $60 RunPod, $80 OpenAI + OpenRouter combined. Budget is a cap, not a targe
 
 | 2026-10-13 | Emotion stories (24k) + neutral dialogues, Luna low effort | OpenAI | $2.37 |
 | 2026-10-13 | GPU: pod 1 (failed at import, ~0.3 h) + pod 2 (sessions 1+2, ~1.4 h), H100 SXM $3.99/h, + volume | RunPod | $6.48 |
+| 2026-10-14 | Phase 5 emotion regression + lens check (CPU, laptop) | – | $0.00 |
 
 Network volume rh-decomp (200 GB, AP-JP-1) keeps billing ~$0.46/day until deleted.
 

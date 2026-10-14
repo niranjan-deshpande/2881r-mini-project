@@ -15,7 +15,7 @@ DEFAULT_ALPHAS = {"lasso": np.logspace(-4, 0, 17), "ridge": np.logspace(-2, 5, 1
 
 
 def _model(kind, alpha=1.0):
-    est = Lasso(alpha=alpha, max_iter=20000) if kind == "lasso" else Ridge(alpha=alpha)
+    est = Lasso(alpha=alpha, max_iter=20000, precompute=True) if kind == "lasso" else Ridge(alpha=alpha)
     return make_pipeline(StandardScaler(), est)
 
 

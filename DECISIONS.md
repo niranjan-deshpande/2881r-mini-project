@@ -72,3 +72,10 @@ One line per non-obvious choice, with the reason. Newest at the bottom of each s
 - Phase 2 confound labels: consensus of Luna + Haiku; eval_awareness BROAD is primary, narrow secondary.
 - Selection half is used only for CHECKPOINT C and for the max-detector's fitted parameters.
 - Label-shuffled DoMs are NOT used as a null for R²_geo (reported only as a diagnostic). — Even with balanced flips, v survives because pairs differ in how strongly they express it (Σεᵢ = 0 but Σεᵢ⟨dᵢ, v̂⟩ ≠ 0): on the hack pairs, 6 shuffled DoMs span ~60% of v_hack. The 10 baselines are the null.
+
+## Phase 5: emotion regression (decided 2026-10-14, before looking at its results)
+- Penalized fits (Lasso, Ridge) choose λ by GroupKFold(5) over rollouts on the selection half (300k-token uniform subsample) and report R² on every held-out-half token; the in-sample OLS R² on all held-out tokens is reported alongside for comparability with the Phase 4 functional R². — Keeps the held-out half for reporting only; data are too large for 40 predictors to overfit, so the two agree closely.
+- Both λ_min and λ_1se (largest λ within one CV standard error of the best) are reported. — At λ_min Lasso keeps almost every emotion on millions of tokens; λ_1se is the standard sparse choice.
+- Targets standardized before fitting so that one α grid serves every target (R² is unchanged).
+- Null: the 10 baseline DoMs as targets (brief). Balanced-shuffle DoMs are reported as a diagnostic only: they keep part of v_hack (see Nulls).
+- Claims are made at cluster level: cluster Shapley shares of the OLS R² (10 clusters, exact) and per-cluster Lasso selection frequencies. — The 40 emotion scores sum to zero (grand-mean subtraction), so the design is exactly collinear and Lasso picks arbitrarily within clusters.
